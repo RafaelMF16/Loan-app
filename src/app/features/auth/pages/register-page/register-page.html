@@ -1,9 +1,4 @@
-<app-auth-layout
-  title="Create your account"
-  description="Set up a local user for the static authentication flow. This stays entirely in memory for the current session."
-  panelTitle="Launch a polished onboarding experience before wiring the backend."
-  panelBody="This first slice focuses on responsive authentication screens, solid validation, and a feature-based Angular structure that is ready for future API integration."
->
+<app-auth-layout title="Register">
   @if (feedback()) {
     @if (feedback()?.type === 'success') {
       <div class="mb-6 rounded-2xl border border-emerald-400/30 bg-emerald-400/10 px-4 py-3 text-sm text-emerald-200" role="status">
