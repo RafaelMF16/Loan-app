@@ -1,0 +1,70 @@
+<form class="space-y-6" [formGroup]="form" (ngSubmit)="submit()">
+  <div class="space-y-2">
+    <label class="text-sm font-medium text-slate-200" for="login-email">Email</label>
+    <input
+      id="login-email"
+      type="email"
+      formControlName="email"
+      autocomplete="email"
+      class="w-full rounded-2xl border border-white/10 bg-slate-950 px-4 py-3 text-slate-100 outline-none transition placeholder:text-slate-500 focus:border-cyan-400 focus:ring-2 focus:ring-cyan-400/30"
+      placeholder="you@company.com"
+    />
+    @if (fieldInvalid('email')) {
+      <p class="text-sm text-rose-300">
+        @if (form.controls.email.hasError('required')) {
+          Email is required.
+        } @else if (form.controls.email.hasError('email')) {
+          Enter a valid email address.
+        }
+      </p>
+    }
+  </div>
+
+  <div class="space-y-2">
+    <label class="text-sm font-medium text-slate-200" for="login-password">Password</label>
+    <input
+      id="login-password"
+      type="password"
+      formControlName="password"
+      autocomplete="current-password"
+      class="w-full rounded-2xl border border-white/10 bg-slate-950 px-4 py-3 text-slate-100 outline-none transition placeholder:text-slate-500 focus:border-cyan-400 focus:ring-2 focus:ring-cyan-400/30"
+      placeholder="Enter your password"
+    />
+    @if (fieldInvalid('password')) {
+      <p class="text-sm text-rose-300">
+        @if (form.controls.password.hasError('required')) {
+          Password is required.
+        } @else if (form.controls.password.hasError('minlength')) {
+          Password must be at least {{ passwordMinLength }} characters.
+        }
+      </p>
+    }
+  </div>
+
+  @if (hasError()) {
+    <div class="rounded-2xl border border-rose-400/30 bg-rose-400/10 px-4 py-3 text-sm text-rose-200" role="alert">
+      {{ authError() }}
+    </div>
+  }
+
+  <button
+    type="submit"
+    [disabled]="form.invalid"
+    class="w-full rounded-2xl bg-cyan-400 px-4 py-3 text-sm font-semibold text-slate-950 transition hover:bg-cyan-300 focus:outline-none focus:ring-2 focus:ring-cyan-300/50 disabled:cursor-not-allowed disabled:bg-slate-700 disabled:text-slate-400"
+  >
+    Sign in
+  </button>
+
+  <p class="text-center text-sm text-slate-400">
+    Need an account?
+    <a routerLink="/auth/register" class="font-medium text-cyan-300 transition hover:text-cyan-200">
+      Create one
+    </a>
+  </p>
+
+  <div class="rounded-2xl border border-white/10 bg-slate-950/70 px-4 py-3 text-sm text-slate-400">
+    Demo users:
+    <span class="block pt-2 text-slate-200">ana@loanapp.com / LoanApp123</span>
+    <span class="block text-slate-200">bruno@loanapp.com / SecurePass456</span>
+  </div>
+</form>

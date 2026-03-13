@@ -1,0 +1,12 @@
+<app-auth-layout
+  title="Sign in to Loan App"
+  description="Access the item loan workspace with a static authentication flow prepared for front-end validation."
+>
+  @if (successMessage()) {
+    <div class="mb-6 rounded-2xl border border-emerald-400/30 bg-emerald-400/10 px-4 py-3 text-sm text-emerald-200" role="status">
+      {{ successMessage() }}
+    </div>
+  }
+
+  <app-login-form [authError]="authError()" (submitted)="handleLogin($event)" />
+</app-auth-layout>
