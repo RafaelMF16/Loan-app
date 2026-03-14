@@ -1,8 +1,8 @@
 import { Injectable, computed, signal } from '@angular/core';
 
-import { AuthCredentials } from '../models/auth-credentials.model';
-import { AuthUser } from '../models/auth-user.model';
-import { RegisterPayload } from '../models/register-payload.model';
+import { AuthCredentials } from '../../models/auth/auth-credentials.model';
+import { AuthUser } from '../../models/auth/auth-user.model';
+import { RegisterPayload } from '../../models/auth/register-payload.model';
 
 const STATIC_USERS: AuthUser[] = [
   {
@@ -47,7 +47,7 @@ export class StaticAuthService {
     if (existingUser) {
       return {
         success: false,
-        message: 'Este e-mail ja esta em uso por uma conta local.',
+        message: 'Este e-mail já está em uso por uma conta local.',
       };
     }
 
@@ -62,7 +62,7 @@ export class StaticAuthService {
 
     return {
       success: true,
-      message: 'Conta criada com sucesso. Agora voce ja pode entrar com essas credenciais.',
+      message: 'Conta criada com sucesso. Agora você já pode entrar com essas credenciais.',
     };
   }
 }
