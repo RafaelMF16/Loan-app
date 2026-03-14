@@ -1,41 +1,41 @@
 <form class="space-y-6" [formGroup]="form" (ngSubmit)="submit()">
   <div class="space-y-2">
-    <label class="text-sm font-medium text-slate-200" for="login-email">Email</label>
+    <label class="text-sm font-medium text-slate-200" for="login-email">E-mail</label>
     <input
       id="login-email"
       type="email"
       formControlName="email"
       autocomplete="email"
       class="w-full rounded-2xl border border-white/10 bg-slate-950 px-4 py-3 text-slate-100 outline-none transition placeholder:text-slate-500 focus:border-cyan-400 focus:ring-2 focus:ring-cyan-400/30"
-      placeholder="you@company.com"
+      placeholder="voce@empresa.com"
     />
     @if (fieldInvalid('email')) {
       <p class="text-sm text-rose-300">
         @if (form.controls.email.hasError('required')) {
-          Email is required.
+          O e-mail é obrigatório.
         } @else if (form.controls.email.hasError('email')) {
-          Enter a valid email address.
+          Informe um e-mail válido.
         }
       </p>
     }
   </div>
 
   <div class="space-y-2">
-    <label class="text-sm font-medium text-slate-200" for="login-password">Password</label>
+    <label class="text-sm font-medium text-slate-200" for="login-password">Senha</label>
     <input
       id="login-password"
       type="password"
       formControlName="password"
       autocomplete="current-password"
       class="w-full rounded-2xl border border-white/10 bg-slate-950 px-4 py-3 text-slate-100 outline-none transition placeholder:text-slate-500 focus:border-cyan-400 focus:ring-2 focus:ring-cyan-400/30"
-      placeholder="Enter your password"
+      placeholder="Digite sua senha"
     />
     @if (fieldInvalid('password')) {
       <p class="text-sm text-rose-300">
         @if (form.controls.password.hasError('required')) {
-          Password is required.
+          A senha é obrigatória.
         } @else if (form.controls.password.hasError('minlength')) {
-          Password must be at least {{ passwordMinLength }} characters.
+          A senha deve ter no mínimo {{ passwordMinLength }} caracteres.
         }
       </p>
     }
@@ -52,13 +52,13 @@
     [disabled]="form.invalid"
     class="w-full rounded-2xl bg-cyan-400 px-4 py-3 text-sm font-semibold text-slate-950 transition hover:bg-cyan-300 focus:outline-none focus:ring-2 focus:ring-cyan-300/50 disabled:cursor-not-allowed disabled:bg-slate-700 disabled:text-slate-400"
   >
-    Sign in
+    Entrar
   </button>
 
   <p class="text-center text-sm text-slate-400">
-    Need an account?
+    Ainda não tem conta?
     <a routerLink="/auth/register" class="font-medium text-cyan-300 transition hover:text-cyan-200">
-      Create one
+      Cadastre-se
     </a>
   </p>
 </form>

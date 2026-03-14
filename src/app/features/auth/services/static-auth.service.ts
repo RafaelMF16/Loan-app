@@ -47,7 +47,7 @@ export class StaticAuthService {
     if (existingUser) {
       return {
         success: false,
-        message: 'This email is already in use by a static account.',
+        message: 'Este e-mail ja esta em uso por uma conta local.',
       };
     }
 
@@ -62,7 +62,7 @@ export class StaticAuthService {
 
     return {
       success: true,
-      message: 'Account created locally. You can now sign in with these credentials.',
+      message: 'Conta criada com sucesso. Agora voce ja pode entrar com essas credenciais.',
     };
   }
 }

@@ -24,12 +24,12 @@ export class LoginPageComponent {
 
     if (!user) {
       this.successMessage.set(null);
-      this.authError.set('Invalid email or password. Try one of the demo users below.');
+      this.authError.set('E-mail ou senha invalidos.');
       return;
     }
 
     this.authError.set(null);
-    this.successMessage.set(`Welcome back, ${user.name}. Static login completed successfully.`);
+    this.successMessage.set(`Bem-vindo de volta, ${user.name}. Login realizado com sucesso.`);
     void this.router.navigateByUrl('/auth/login');
   }
 }
