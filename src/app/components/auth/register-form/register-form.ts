@@ -2,13 +2,14 @@ import { Component, inject, output } from '@angular/core';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { RouterLink } from '@angular/router';
 
-import { RegisterPayload } from '../../models/register-payload.model';
+import { RegisterPayload } from '../../../models/auth/register-payload.model';
 
 @Component({
   selector: 'app-register-form',
   standalone: true,
   imports: [ReactiveFormsModule, RouterLink],
   templateUrl: './register-form.html',
+  styleUrl: './register-form.scss',
 })
 export class RegisterFormComponent {
   private readonly formBuilder = inject(FormBuilder);
@@ -32,7 +33,7 @@ export class RegisterFormComponent {
     }
   );
 
-  submit(): void {
+  onClickSubmitRegister(): void {
     if (this.form.invalid) {
       this.form.markAllAsTouched();
       return;

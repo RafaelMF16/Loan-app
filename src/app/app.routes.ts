@@ -9,14 +9,14 @@ export const routes: Routes = [
   {
     path: 'auth/login',
     loadComponent: () =>
-      import('./features/auth/pages/login-page/login-page').then(
+      import('./pages/auth/login-page/login-page').then(
         (module) => module.LoginPageComponent
       ),
   },
   {
     path: 'auth/register',
     loadComponent: () =>
-      import('./features/auth/pages/register-page/register-page').then(
+      import('./pages/auth/register-page/register-page').then(
         (module) => module.RegisterPageComponent
       ),
   },

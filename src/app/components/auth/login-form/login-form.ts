@@ -3,13 +3,14 @@ import { Component, computed, inject, input, output } from '@angular/core';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { RouterLink } from '@angular/router';
 
-import { AuthCredentials } from '../../models/auth-credentials.model';
+import { AuthCredentials } from '../../../models/auth/auth-credentials.model';
 
 @Component({
   selector: 'app-login-form',
   standalone: true,
   imports: [CommonModule, ReactiveFormsModule, RouterLink],
   templateUrl: './login-form.html',
+  styleUrl: './login-form.scss',
 })
 export class LoginFormComponent {
   private readonly formBuilder = inject(FormBuilder);
@@ -25,7 +26,7 @@ export class LoginFormComponent {
   readonly passwordMinLength = 8;
   readonly hasError = computed(() => !!this.authError());
 
-  submit(): void {
+  onClickSubmitLogin(): void {
     if (this.form.invalid) {
       this.form.markAllAsTouched();
       return;
