@@ -1,9 +1,62 @@
-<section class="flex min-h-screen items-center justify-center bg-slate-950 px-4 py-10 text-slate-100">
-  <div class="w-full max-w-md rounded-3xl border border-white/10 bg-slate-900 p-6 shadow-2xl shadow-cyan-950/20 sm:p-8">
-    <h1 class="mb-8 text-center text-3xl font-semibold tracking-tight text-white">
-      {{ title() }}
-    </h1>
+<section class="min-h-screen bg-slate-100 text-slate-900">
+  <header class="border-b border-slate-200 bg-white">
+    <div class="mx-auto flex max-w-[1600px] items-center gap-3 px-6 py-4">
+      <div class="flex h-10 w-10 items-center justify-center rounded-xl bg-blue-50 text-blue-600">
+        <svg viewBox="0 0 24 24" class="h-7 w-7" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <path d="M3 10.5h18" />
+          <path d="M5 10.5V19" />
+          <path d="M10 10.5V19" />
+          <path d="M14 10.5V19" />
+          <path d="M19 10.5V19" />
+          <path d="M2.5 21h19" />
+          <path d="M12 3 3 7.5h18L12 3Z" />
+        </svg>
+      </div>
+      <span class="text-[2rem] font-semibold tracking-tight text-slate-950">LoanManager</span>
+    </div>
+  </header>
 
-    <ng-content />
+  <div class="flex min-h-[calc(100vh-73px)] items-center justify-center px-4 py-10">
+    <div class="w-full max-w-[600px] overflow-hidden rounded-[24px] bg-white shadow-[0_24px_60px_rgba(15,23,42,0.14)]">
+      <div class="h-40 bg-gradient-to-r from-sky-100 to-blue-50"></div>
+
+      <div class="px-10 pb-10">
+        <div class="border-b border-slate-200">
+          <nav class="flex gap-10" aria-label="Acesso">
+            <a
+              routerLink="/auth/login"
+              [class.text-blue-600]="activeTab() === 'login'"
+              [class.border-blue-500]="activeTab() === 'login'"
+              [class.text-slate-500]="activeTab() !== 'login'"
+              class="border-b-2 px-0 py-5 text-[1.05rem] font-semibold transition"
+            >
+              Entrar
+            </a>
+            <a
+              routerLink="/auth/register"
+              [class.text-blue-600]="activeTab() === 'register'"
+              [class.border-blue-500]="activeTab() === 'register'"
+              [class.text-slate-500]="activeTab() !== 'register'"
+              class="border-b-2 px-0 py-5 text-[1.05rem] font-semibold transition"
+            >
+              Cadastrar
+            </a>
+          </nav>
+        </div>
+
+        <div class="pt-10">
+          <h1 class="text-[3rem] font-semibold leading-none tracking-tight text-slate-950">
+            {{ title() }}
+          </h1>
+          <p class="mt-4 text-xl leading-8 text-slate-500">
+            {{ subtitle() }}
+          </p>
+
+          <div class="mt-10">
+            <ng-content />
+          </div>
+        </div>
+      </div>
+    </div>
   </div>
 </section>

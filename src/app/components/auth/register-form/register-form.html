@@ -1,35 +1,35 @@
 <form class="space-y-6" [formGroup]="form" (ngSubmit)="onClickSubmitRegister()">
   <div class="space-y-2">
-    <label class="text-sm font-medium text-slate-200" for="register-name">Nome completo</label>
+    <label class="text-sm font-semibold text-slate-900" for="register-name">Nome completo</label>
     <input
       id="register-name"
       type="text"
       formControlName="name"
       autocomplete="name"
-      class="w-full rounded-2xl border border-white/10 bg-slate-950 px-4 py-3 text-slate-100 outline-none transition placeholder:text-slate-500 focus:border-cyan-400 focus:ring-2 focus:ring-cyan-400/30"
-      placeholder="João Silva"
+      class="w-full rounded-2xl border border-slate-200 bg-white px-5 py-4 text-base text-slate-900 outline-none transition placeholder:text-slate-400 focus:border-blue-400 focus:ring-4 focus:ring-blue-100"
+      placeholder="Joao Silva"
     />
     @if (fieldInvalid('name')) {
-      <p class="text-sm text-rose-300">O nome é obrigatório.</p>
+      <p class="text-sm text-rose-500">O nome e obrigatorio.</p>
     }
   </div>
 
   <div class="space-y-2">
-    <label class="text-sm font-medium text-slate-200" for="register-email">E-mail</label>
+    <label class="text-sm font-semibold text-slate-900" for="register-email">E-mail</label>
     <input
       id="register-email"
       type="email"
       formControlName="email"
       autocomplete="email"
-      class="w-full rounded-2xl border border-white/10 bg-slate-950 px-4 py-3 text-slate-100 outline-none transition placeholder:text-slate-500 focus:border-cyan-400 focus:ring-2 focus:ring-cyan-400/30"
+      class="w-full rounded-2xl border border-slate-200 bg-white px-5 py-4 text-base text-slate-900 outline-none transition placeholder:text-slate-400 focus:border-blue-400 focus:ring-4 focus:ring-blue-100"
       placeholder="joao@empresa.com"
     />
     @if (fieldInvalid('email')) {
-      <p class="text-sm text-rose-300">
+      <p class="text-sm text-rose-500">
         @if (form.controls.email.hasError('required')) {
-          O e-mail é obrigatório.
+          O e-mail e obrigatorio.
         } @else if (form.controls.email.hasError('email')) {
-          Informe um e-mail válido.
+          Informe um e-mail valido.
         }
       </p>
     }
@@ -37,40 +37,40 @@
 
   <div class="grid gap-6 sm:grid-cols-2">
     <div class="space-y-2">
-      <label class="text-sm font-medium text-slate-200" for="register-password">Senha</label>
+      <label class="text-sm font-semibold text-slate-900" for="register-password">Senha</label>
       <input
         id="register-password"
         type="password"
         formControlName="password"
         autocomplete="new-password"
-        class="w-full rounded-2xl border border-white/10 bg-slate-950 px-4 py-3 text-slate-100 outline-none transition placeholder:text-slate-500 focus:border-cyan-400 focus:ring-2 focus:ring-cyan-400/30"
+        class="w-full rounded-2xl border border-slate-200 bg-white px-5 py-4 text-base text-slate-900 outline-none transition placeholder:text-slate-400 focus:border-blue-400 focus:ring-4 focus:ring-blue-100"
         placeholder="Crie uma senha"
       />
       @if (fieldInvalid('password')) {
-        <p class="text-sm text-rose-300">
+        <p class="text-sm text-rose-500">
           @if (form.controls.password.hasError('required')) {
-            A senha é obrigatória.
+            A senha e obrigatoria.
           } @else if (form.controls.password.hasError('minlength')) {
-            A senha deve ter no mínimo {{ passwordMinLength }} caracteres.
+            A senha deve ter no minimo {{ passwordMinLength }} caracteres.
           }
         </p>
       }
     </div>
 
     <div class="space-y-2">
-      <label class="text-sm font-medium text-slate-200" for="register-confirm-password">Confirmar senha</label>
+      <label class="text-sm font-semibold text-slate-900" for="register-confirm-password">Confirmar senha</label>
       <input
         id="register-confirm-password"
         type="password"
         formControlName="confirmPassword"
         autocomplete="new-password"
-        class="w-full rounded-2xl border border-white/10 bg-slate-950 px-4 py-3 text-slate-100 outline-none transition placeholder:text-slate-500 focus:border-cyan-400 focus:ring-2 focus:ring-cyan-400/30"
+        class="w-full rounded-2xl border border-slate-200 bg-white px-5 py-4 text-base text-slate-900 outline-none transition placeholder:text-slate-400 focus:border-blue-400 focus:ring-4 focus:ring-blue-100"
         placeholder="Repita sua senha"
       />
       @if (fieldInvalid('confirmPassword')) {
-        <p class="text-sm text-rose-300">A confirmação de senha é obrigatória.</p>
+        <p class="text-sm text-rose-500">A confirmacao de senha e obrigatoria.</p>
       } @else if (form.hasError('passwordMismatch') && form.controls.confirmPassword.touched) {
-        <p class="text-sm text-rose-300">As senhas devem ser iguais.</p>
+        <p class="text-sm text-rose-500">As senhas devem ser iguais.</p>
       }
     </div>
   </div>
@@ -78,15 +78,8 @@
   <button
     type="submit"
     [disabled]="form.invalid"
-    class="w-full rounded-2xl bg-cyan-400 px-4 py-3 text-sm font-semibold text-slate-950 transition hover:bg-cyan-300 focus:outline-none focus:ring-2 focus:ring-cyan-300/50 disabled:cursor-not-allowed disabled:bg-slate-700 disabled:text-slate-400"
+    class="w-full rounded-2xl bg-blue-500 px-4 py-4 text-base font-semibold text-white transition hover:bg-blue-600 focus:outline-none focus:ring-4 focus:ring-blue-100 disabled:cursor-not-allowed disabled:bg-slate-300"
   >
     Cadastrar
   </button>
-
-  <p class="text-center text-sm text-slate-400">
-    Já tem uma conta?
-    <a routerLink="/auth/login" class="font-medium text-cyan-300 transition hover:text-cyan-200">
-      Voltar para entrar
-    </a>
-  </p>
 </form>

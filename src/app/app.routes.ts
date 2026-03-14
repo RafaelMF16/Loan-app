@@ -21,6 +21,13 @@ export const routes: Routes = [
       ),
   },
   {
+    path: 'items',
+    loadComponent: () =>
+      import('./pages/items/list-page/list-page').then(
+        (module) => module.ListPageComponent
+      ),
+  },
+  {
     path: '**',
     redirectTo: 'auth/login',
   },
