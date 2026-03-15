@@ -13,7 +13,6 @@ const INITIAL_ITEMS: InventoryItem[] = [
   {
     id: 1,
     name: 'MacBook Pro 16"',
-    serialNumber: 'MBP-2024-001',
     description: 'Notebook para design e desenvolvimento.',
     status: 'emprestado',
     statusDetail: 'Devolucao em 3 dias',
@@ -22,7 +21,6 @@ const INITIAL_ITEMS: InventoryItem[] = [
   {
     id: 2,
     name: 'Sony Alpha A7 IV',
-    serialNumber: 'SNY-CAM-882',
     description: 'Camera full-frame para producao audiovisual.',
     status: 'disponivel',
     icon: 'camera',
@@ -30,7 +28,6 @@ const INITIAL_ITEMS: InventoryItem[] = [
   {
     id: 3,
     name: 'iPad Air M2',
-    serialNumber: 'TBL-IPD-339',
     description: 'Tablet para apresentacoes e suporte em campo.',
     status: 'disponivel',
     icon: 'tablet',
@@ -38,7 +35,6 @@ const INITIAL_ITEMS: InventoryItem[] = [
   {
     id: 4,
     name: 'Bose Noise Cancelling 700',
-    serialNumber: 'AUD-BOS-110',
     description: 'Fone para reunioes e gravacoes.',
     status: 'emprestado',
     statusDetail: 'Vence hoje',
@@ -66,7 +62,7 @@ export class ListPageComponent {
     }
 
     return this.items().filter((item) =>
-      [item.name, item.serialNumber, item.description, this.getStatusLabel(item.status)]
+      [item.name, item.description, this.getStatusLabel(item.status)]
         .join(' ')
         .toLowerCase()
         .includes(query)
@@ -90,7 +86,6 @@ export class ListPageComponent {
     const nextItem: InventoryItem = {
       id: Date.now(),
       name: payload.name,
-      serialNumber: this.generateSerialNumber(payload.status),
       description: payload.description,
       status: payload.status,
       statusDetail:
@@ -118,11 +113,6 @@ export class ListPageComponent {
 
   getStatusDotClasses(status: InventoryItemStatus): string {
     return status === 'disponivel' ? 'bg-emerald-500' : 'bg-amber-500';
-  }
-
-  private generateSerialNumber(status: InventoryItemStatus): string {
-    const prefix = status === 'disponivel' ? 'INV' : 'EMP';
-    return `${prefix}-${String(this.items().length + 1).padStart(3, '0')}`;
   }
 
   private pickIcon(itemName: string): InventoryItemIcon {
