@@ -28,6 +28,13 @@ export const routes: Routes = [
       ),
   },
   {
+    path: 'items/:id',
+    loadComponent: () =>
+      import('./pages/items/detail-page/detail-page').then(
+        (module) => module.DetailPageComponent
+      ),
+  },
+  {
     path: '**',
     redirectTo: 'auth/login',
   },

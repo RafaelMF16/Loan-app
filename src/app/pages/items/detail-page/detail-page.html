@@ -1,0 +1,55 @@
+<section class="min-h-screen bg-white">
+  <app-app-header [showAvatar]="true" />
+
+  <main class="min-h-[calc(100vh-65px)] bg-slate-50 px-5 py-10 text-slate-900">
+    <div class="mx-auto w-full max-w-4xl">
+      @if (item(); as selectedItem) {
+        <nav class="text-base text-slate-500">
+          <a routerLink="/items" class="transition hover:text-slate-700">Itens</a>
+          <span class="mx-3 text-slate-300">></span>
+          <span class="font-medium text-slate-800">Detalhes</span>
+        </nav>
+
+        <section class="mt-8">
+          <div class="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
+            <div>
+              <h1 class="text-[3rem] font-semibold leading-none tracking-tight text-slate-950">
+                {{ selectedItem.name }}
+              </h1>
+            </div>
+
+            <span
+              class="inline-flex items-center gap-2 self-start rounded-full px-4 py-2 text-lg font-semibold"
+              [class]="getStatusClasses(selectedItem.status)"
+            >
+              <span class="h-2.5 w-2.5 rounded-full" [class]="getStatusDotClasses(selectedItem.status)"></span>
+              {{ getStatusLabel(selectedItem.status) }}
+            </span>
+          </div>
+
+          <div class="mt-10 border-t border-slate-200 pt-8">
+            <p class="text-sm font-semibold uppercase tracking-[0.18em] text-slate-400">
+              Descricao
+            </p>
+            <p class="mt-5 max-w-3xl text-[1.15rem] leading-10 text-slate-800">
+              {{ selectedItem.description }}
+            </p>
+          </div>
+        </section>
+      } @else {
+        <section class="rounded-[24px] border border-dashed border-slate-200 bg-white px-6 py-14 text-center shadow-[0_18px_40px_rgba(15,23,42,0.06)]">
+          <h1 class="text-2xl font-semibold text-slate-950">Item nao encontrado</h1>
+          <p class="mt-3 text-base text-slate-500">
+            O item selecionado nao esta disponivel nesta lista estatica.
+          </p>
+          <a
+            routerLink="/items"
+            class="mt-6 inline-flex items-center rounded-2xl bg-blue-500 px-6 py-3 text-base font-semibold text-white transition hover:bg-blue-600"
+          >
+            Voltar para itens
+          </a>
+        </section>
+      }
+    </div>
+  </main>
+</section>
