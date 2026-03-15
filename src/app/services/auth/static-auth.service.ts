@@ -7,9 +7,9 @@ import { RegisterPayload } from '../../models/auth/register-payload.model';
 const STATIC_USERS: AuthUser[] = [
   {
     id: 1,
-    name: 'Ana Silva',
-    email: 'ana@loanapp.com',
-    password: 'LoanApp123',
+    name: 'Rafael Ferreira',
+    email: 'rafael@email.com',
+    password: '123123123',
   },
   {
     id: 2,

@@ -1,16 +1,27 @@
 <header class="border-b border-slate-200 bg-white">
-  <div class="flex items-center gap-3 px-5 py-3">
-    <div class="flex h-9 w-9 items-center justify-center rounded-lg bg-blue-50 text-blue-600">
-      <svg viewBox="0 0 24 24" class="h-6 w-6" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-        <path d="M3 10.5h18" />
-        <path d="M5 10.5V19" />
-        <path d="M10 10.5V19" />
-        <path d="M14 10.5V19" />
-        <path d="M19 10.5V19" />
-        <path d="M2.5 21h19" />
-        <path d="M12 3 3 7.5h18L12 3Z" />
-      </svg>
+  <div class="flex items-center justify-between gap-4 px-5 py-3">
+    <div class="flex items-center gap-3">
+      <div class="flex h-9 w-9 items-center justify-center rounded-lg bg-blue-50 text-blue-600">
+        <svg viewBox="0 0 24 24" class="h-6 w-6" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <path d="M3 10.5h18" />
+          <path d="M5 10.5V19" />
+          <path d="M10 10.5V19" />
+          <path d="M14 10.5V19" />
+          <path d="M19 10.5V19" />
+          <path d="M2.5 21h19" />
+          <path d="M12 3 3 7.5h18L12 3Z" />
+        </svg>
+      </div>
+      <span class="text-[1.5rem] font-semibold tracking-tight text-slate-950">Gestao de Itens</span>
     </div>
-    <span class="text-[1.65rem] font-semibold tracking-tight text-slate-950">LoanManager</span>
+
+    @if (showAvatar()) {
+      <div class="flex h-11 w-11 items-center justify-center rounded-full border border-slate-200 bg-slate-50 text-slate-500">
+        <svg viewBox="0 0 24 24" class="h-6 w-6" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <path d="M20 21a8 8 0 0 0-16 0" />
+          <circle cx="12" cy="8" r="4" />
+        </svg>
+      </div>
+    }
   </div>
 </header>
