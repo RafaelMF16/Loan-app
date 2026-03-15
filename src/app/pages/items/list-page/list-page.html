@@ -46,7 +46,10 @@
         <div class="mt-5 space-y-3">
           @for (item of filteredItems(); track item.id) {
             <article class="flex flex-col gap-4 rounded-[20px] border border-slate-200 bg-white px-4 py-4 transition hover:border-blue-200 hover:shadow-[0_12px_28px_rgba(15,23,42,0.06)] md:flex-row md:items-center md:justify-between">
-              <div class="flex items-center gap-4">
+              <a
+                class="flex min-w-0 flex-1 items-center gap-4 rounded-2xl outline-none transition focus-visible:ring-4 focus-visible:ring-blue-100"
+                [routerLink]="['/items', item.id]"
+              >
                 <div class="flex h-14 w-14 items-center justify-center rounded-2xl bg-slate-100 text-slate-600">
                   @switch (item.icon) {
                     @case ('camera') {
@@ -82,7 +85,7 @@
                   <h3 class="text-[1.65rem] font-semibold leading-tight text-slate-950">{{ item.name }}</h3>
                   <p class="mt-1 text-base text-slate-500">{{ item.description }}</p>
                 </div>
-              </div>
+              </a>
 
               <div class="flex items-center gap-4 self-end md:self-center">
                 <div class="text-right">
