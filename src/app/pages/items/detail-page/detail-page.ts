@@ -28,11 +28,6 @@ export class DetailPageComponent {
     this.inventoryItemsService.getItemById(this.itemId())
   );
 
-  readonly itemReference = computed(() => {
-    const item = this.item();
-    return item ? `ITEM-${String(item.id).padStart(3, '0')}` : '';
-  });
-
   getStatusLabel(status: InventoryItemStatus): string {
     return status === 'disponivel' ? 'Disponivel' : 'Emprestado';
   }
