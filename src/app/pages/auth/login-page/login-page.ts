@@ -25,12 +25,12 @@ export class LoginPageComponent {
 
     if (!user) {
       this.successMessage.set(null);
-      this.authError.set('E-mail ou senha inválidos.');
+      this.authError.set('E-mail ou senha invalidos.');
       return;
     }
 
     this.authError.set(null);
-    this.successMessage.set(`Bem-vindo de volta, ${user.name}. Login realizado com sucesso.`);
-    void this.router.navigateByUrl('/auth/login');
+    this.successMessage.set(`Bem-vindo de volta, ${user.name}.`);
+    void this.router.navigateByUrl('/items');
   }
 }

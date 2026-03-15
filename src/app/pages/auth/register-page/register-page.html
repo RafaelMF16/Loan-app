@@ -1,11 +1,15 @@
-<app-auth-layout title="Cadastro">
+<app-auth-layout
+  title="Crie sua conta"
+  subtitle="Preencha os dados abaixo para comecar a usar o LoanManager."
+  activeTab="register"
+>
   @if (feedback()) {
     @if (feedback()?.type === 'success') {
-      <div class="mb-6 rounded-2xl border border-emerald-400/30 bg-emerald-400/10 px-4 py-3 text-sm text-emerald-200" role="status">
+      <div class="mb-6 rounded-2xl border border-emerald-200 bg-emerald-50 px-4 py-3 text-sm text-emerald-700" role="status">
         {{ feedback()?.message }}
       </div>
     } @else {
-      <div class="mb-6 rounded-2xl border border-rose-400/30 bg-rose-400/10 px-4 py-3 text-sm text-rose-200" role="status">
+      <div class="mb-6 rounded-2xl border border-rose-200 bg-rose-50 px-4 py-3 text-sm text-rose-600" role="status">
         {{ feedback()?.message }}
       </div>
     }

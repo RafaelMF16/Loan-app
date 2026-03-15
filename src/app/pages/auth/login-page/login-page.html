@@ -1,6 +1,10 @@
-<app-auth-layout title="Entrar">
+<app-auth-layout
+  title="Bem-vindo de volta"
+  subtitle="Insira suas credenciais para gerenciar seus emprestimos."
+  activeTab="login"
+>
   @if (successMessage()) {
-    <div class="mb-6 rounded-2xl border border-emerald-400/30 bg-emerald-400/10 px-4 py-3 text-sm text-emerald-200" role="status">
+    <div class="mb-6 rounded-2xl border border-emerald-200 bg-emerald-50 px-4 py-3 text-sm text-emerald-700" role="status">
       {{ successMessage() }}
     </div>
   }

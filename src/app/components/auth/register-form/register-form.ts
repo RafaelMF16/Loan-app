@@ -1,13 +1,12 @@
 import { Component, inject, output } from '@angular/core';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
-import { RouterLink } from '@angular/router';
 
 import { RegisterPayload } from '../../../models/auth/register-payload.model';
 
 @Component({
   selector: 'app-register-form',
   standalone: true,
-  imports: [ReactiveFormsModule, RouterLink],
+  imports: [ReactiveFormsModule],
   templateUrl: './register-form.html',
   styleUrl: './register-form.scss',
 })
