@@ -1,7 +1,9 @@
 <div class="fixed inset-0 z-50 flex items-center justify-center bg-slate-950/45 px-4 py-8 backdrop-blur-sm">
   <div class="w-full max-w-[500px] overflow-hidden rounded-[20px] bg-white shadow-[0_26px_64px_rgba(15,23,42,0.22)]">
     <div class="flex items-center justify-between border-b border-slate-200 px-6 py-5">
-      <h2 class="text-[1.7rem] font-semibold tracking-tight text-slate-950">Cadastrar Novo Item</h2>
+      <h2 class="text-[1.7rem] font-semibold tracking-tight text-slate-950">
+        {{ isEditMode ? 'Editar Item' : 'Cadastrar Novo Item' }}
+      </h2>
       <button
         type="button"
         (click)="onClickCloseModal()"
@@ -28,25 +30,25 @@
       </div>
 
       <div class="space-y-2.5">
-        <label class="block text-lg font-semibold text-slate-900" for="item-description">Descricao do Item</label>
+        <label class="block text-lg font-semibold text-slate-900" for="item-description">Descrição do Item</label>
         <textarea
           id="item-description"
           rows="3"
           formControlName="description"
           class="w-full resize-none rounded-2xl border border-slate-200 px-4 py-3.5 text-sm text-slate-900 outline-none transition placeholder:text-slate-400 focus:border-blue-400 focus:ring-4 focus:ring-blue-100"
-          placeholder="Detalhes tecnicos, cor, estado de conservacao..."
+          placeholder="Detalhes técnicos, cor, estado de conservação..."
         ></textarea>
       </div>
 
       <div class="space-y-2.5">
-        <label class="block text-lg font-semibold text-slate-900" for="item-status">Status Inicial</label>
+        <label class="block text-lg font-semibold text-slate-900" for="item-status">Status</label>
         <div class="relative">
           <select
             id="item-status"
             formControlName="status"
             class="w-full appearance-none rounded-2xl border border-slate-200 bg-white px-4 py-3.5 pr-12 text-sm text-slate-900 outline-none transition focus:border-blue-400 focus:ring-4 focus:ring-blue-100"
           >
-            <option value="disponivel">Disponivel</option>
+            <option value="disponivel">Disponível</option>
             <option value="emprestado">Emprestado</option>
           </select>
           <svg viewBox="0 0 24 24" class="pointer-events-none absolute right-4 top-1/2 h-5 w-5 -translate-y-1/2 text-slate-500" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
@@ -67,7 +69,7 @@
           type="submit"
           class="w-full rounded-2xl bg-blue-500 px-6 py-3.5 text-base font-semibold text-white shadow-[0_10px_24px_rgba(59,130,246,0.28)] transition hover:bg-blue-600 sm:w-[190px]"
         >
-          Salvar Item
+          {{ isEditMode ? 'Salvar Alterações' : 'Salvar Item' }}
         </button>
       </div>
     </form>

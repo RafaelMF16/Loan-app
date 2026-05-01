@@ -1,0 +1,17 @@
+CREATE TABLE IF NOT EXISTS users (
+  id SERIAL PRIMARY KEY,
+  name VARCHAR(255) NOT NULL,
+  email VARCHAR(255) UNIQUE NOT NULL,
+  password VARCHAR(255) NOT NULL,
+  created_at TIMESTAMP DEFAULT NOW()
+);
+
+CREATE TABLE IF NOT EXISTS items (
+  id SERIAL PRIMARY KEY,
+  name VARCHAR(255) NOT NULL,
+  description TEXT NOT NULL,
+  status VARCHAR(50) NOT NULL DEFAULT 'disponivel',
+  status_detail VARCHAR(255),
+  icon VARCHAR(50) NOT NULL DEFAULT 'notebook',
+  created_at TIMESTAMP DEFAULT NOW()
+);

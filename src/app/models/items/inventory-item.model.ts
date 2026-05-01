@@ -16,3 +16,11 @@ export interface CreateInventoryItemPayload {
   description: string;
   status: InventoryItemStatus;
 }
+
+export interface PaginatedItems {
+  data: InventoryItem[];
+  total: number;
+  page: number;
+  totalPages: number;
+  perPage: number;
+}

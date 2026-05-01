@@ -1,91 +1,77 @@
-import { Injectable, signal } from '@angular/core';
+import { Injectable, computed, inject, signal } from '@angular/core';
+import { Observable, Subject } from 'rxjs';
+import { debounceTime } from 'rxjs/operators';
 
 import {
   CreateInventoryItemPayload,
   InventoryItem,
   InventoryItemIcon,
+  PaginatedItems,
 } from '../../models/items/inventory-item.model';
+import { RequestService } from '../request/request.service';
 
-const INITIAL_ITEMS: InventoryItem[] = [
-  {
-    id: 1,
-    name: 'MacBook Pro 14" (M2)',
-    description:
-      'Ultima revisao tecnica em setembro/2023. Bateria em bom estado (94%). Pequeno risco na tampa superior perto do logo.',
-    status: 'emprestado',
-    statusDetail: 'Devolucao em 3 dias',
-    icon: 'notebook',
-  },
-  {
-    id: 2,
-    name: 'Sony Alpha A7 IV',
-    description:
-      'Camera full-frame pronta para producao audiovisual, com sensor revisado e kit padrao completo.',
-    status: 'disponivel',
-    icon: 'camera',
-  },
-  {
-    id: 3,
-    name: 'iPad Air M2',
-    description:
-      'Tablet para apresentacoes, check-ins em eventos e apoio ao time comercial em campo.',
-    status: 'disponivel',
-    icon: 'tablet',
-  },
-  {
-    id: 4,
-    name: 'Bose Noise Cancelling 700',
-    description:
-      'Fone com cancelamento de ruido para reunioes, gravacoes e uso em ambientes compartilhados.',
-    status: 'emprestado',
-    statusDetail: 'Vence hoje',
-    icon: 'fone',
-  },
-];
+const EMPTY_PAGE: PaginatedItems = { data: [], total: 0, page: 1, totalPages: 1, perPage: 10 };
 
 @Injectable({ providedIn: 'root' })
 export class InventoryItemsService {
-  private readonly itemsState = signal<InventoryItem[]>(INITIAL_ITEMS);
+  private readonly requestService = inject(RequestService);
+  private readonly paginationState = signal<PaginatedItems>(EMPTY_PAGE);
+  private readonly currentSearch = signal('');
+  private readonly searchSubject = new Subject<string>();
 
-  readonly items = this.itemsState.asReadonly();
+  readonly pagination = this.paginationState.asReadonly();
+  readonly items = computed(() => this.paginationState().data);
 
-  getItemById(itemId: number): InventoryItem | undefined {
-    return this.itemsState().find((item) => item.id === itemId);
+  constructor() {
+    this.searchSubject.pipe(debounceTime(300)).subscribe((search) => {
+      this.currentSearch.set(search);
+      this.loadPage(1, search);
+    });
+
+    this.loadPage(1);
+  }
+
+  loadPage(page: number, search = this.currentSearch()): void {
+    const params = `?page=${page}&search=${encodeURIComponent(search)}`;
+    this.requestService.get<PaginatedItems>(`/items${params}`).subscribe({
+      next: (result) => this.paginationState.set(result),
+    });
+  }
+
+  search(query: string): void {
+    this.searchSubject.next(query);
+  }
+
+  fetchById(id: number): Observable<InventoryItem> {
+    return this.requestService.get<InventoryItem>(`/items/${id}`);
+  }
+
+  updateItem(id: number, payload: CreateInventoryItemPayload): Observable<InventoryItem> {
+    return this.requestService.put<InventoryItem>(`/items/${id}`, {
+      ...payload,
+      icon: this.pickIcon(payload.name),
+    });
   }
 
   addItem(payload: CreateInventoryItemPayload): void {
-    const nextItem: InventoryItem = {
-      id: Date.now(),
-      name: payload.name,
-      description: payload.description,
-      status: payload.status,
-      statusDetail:
-        payload.status === 'emprestado' ? 'Devolucao em 7 dias' : undefined,
-      icon: this.pickIcon(payload.name),
-    };
-
-    this.itemsState.update((items) => [nextItem, ...items]);
+    this.requestService
+      .post<InventoryItem>('/items', { ...payload, icon: this.pickIcon(payload.name) })
+      .subscribe({
+        next: () => this.loadPage(1),
+      });
   }
 
   deleteItem(itemId: number): void {
-    this.itemsState.update((items) => items.filter((item) => item.id !== itemId));
+    this.requestService.delete<void>(`/items/${itemId}`).subscribe({
+      next: () => this.loadPage(this.paginationState().page),
+    });
   }
 
   private pickIcon(itemName: string): InventoryItemIcon {
-    const normalizedName = itemName.toLowerCase();
-
-    if (normalizedName.includes('camera') || normalizedName.includes('sony')) {
-      return 'camera';
-    }
-
-    if (normalizedName.includes('ipad') || normalizedName.includes('tablet')) {
-      return 'tablet';
-    }
-
-    if (normalizedName.includes('fone') || normalizedName.includes('headphone')) {
-      return 'fone';
-    }
-
+    const name = itemName.toLowerCase();
+    if (name.includes('camera') || name.includes('sony')) return 'camera';
+    if (name.includes('ipad') || name.includes('tablet')) return 'tablet';
+    if (name.includes('fone') || name.includes('headphone')) return 'fone';
     return 'notebook';
   }
 }

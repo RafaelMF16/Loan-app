@@ -5,7 +5,6 @@ import { AppHeaderComponent } from '../../../components/shared/app-header/app-he
 import { ItemModalComponent } from '../../../components/items/item-modal/item-modal';
 import {
   CreateInventoryItemPayload,
-  InventoryItem,
   InventoryItemStatus,
 } from '../../../models/items/inventory-item.model';
 import { InventoryItemsService } from '../../../services/items/inventory-items.service';
@@ -23,25 +22,38 @@ export class ListPageComponent {
   readonly filterQuery = signal('');
   readonly showNewItemModal = signal(false);
   readonly items = this.inventoryItemsService.items;
+  readonly pagination = this.inventoryItemsService.pagination;
 
-  readonly filteredItems = computed(() => {
-    const query = this.filterQuery().trim().toLowerCase();
+  readonly pages = computed(() =>
+    Array.from({ length: this.pagination().totalPages }, (_, i) => i + 1)
+  );
 
-    if (!query) {
-      return this.items();
-    }
-
-    return this.items().filter((item) =>
-      [item.name, item.description, this.getStatusLabel(item.status)]
-        .join(' ')
-        .toLowerCase()
-        .includes(query)
-    );
+  readonly rangeText = computed(() => {
+    const { page, perPage, total, data } = this.pagination();
+    if (total === 0) return '0 itens';
+    const start = (page - 1) * perPage + 1;
+    const end = start + data.length - 1;
+    return `${start}–${end} de ${total}`;
   });
 
   onInputFilterItems(event: Event): void {
-    const input = event.target as HTMLInputElement;
-    this.filterQuery.set(input.value);
+    const value = (event.target as HTMLInputElement).value;
+    this.filterQuery.set(value);
+    this.inventoryItemsService.search(value);
+  }
+
+  onClickPrevPage(): void {
+    const { page } = this.pagination();
+    if (page > 1) this.inventoryItemsService.loadPage(page - 1);
+  }
+
+  onClickNextPage(): void {
+    const { page, totalPages } = this.pagination();
+    if (page < totalPages) this.inventoryItemsService.loadPage(page + 1);
+  }
+
+  onClickGoToPage(page: number): void {
+    this.inventoryItemsService.loadPage(page);
   }
 
   onClickOpenNewItemModal(): void {
