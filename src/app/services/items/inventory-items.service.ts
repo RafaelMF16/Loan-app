@@ -61,10 +61,8 @@ export class InventoryItemsService {
       });
   }
 
-  deleteItem(itemId: number): void {
-    this.requestService.delete<void>(`/items/${itemId}`).subscribe({
-      next: () => this.loadPage(this.paginationState().page),
-    });
+  deleteItem(itemId: number): Observable<void> {
+    return this.requestService.delete<void>(`/items/${itemId}`);
   }
 
   private pickIcon(itemName: string): InventoryItemIcon {

@@ -12,8 +12,8 @@ export interface PaginatedResult<T> {
 }
 
 export const itemsService = {
-  async getAll(page: number, search: string): Promise<PaginatedResult<Item>> {
-    const { rows, total } = await itemRepository.findAll(page, search);
+  async getAll(page: number, search: string, userId: number): Promise<PaginatedResult<Item>> {
+    const { rows, total } = await itemRepository.findAll(page, search, userId);
     return {
       data: rows,
       total,
@@ -23,24 +23,28 @@ export const itemsService = {
     };
   },
 
-  async getById(id: number): Promise<Item> {
-    const item = await itemRepository.findById(id);
+  async getById(id: number, userId: number): Promise<Item> {
+    const item = await itemRepository.findById(id, userId);
     if (!item) throw new Error('Item não encontrado.');
     return item;
   },
 
-  async create(data: Omit<Item, 'id' | 'created_at'>): Promise<Item> {
-    return itemRepository.create(data);
+  async create(data: Omit<Item, 'id' | 'created_at'>, userId: number): Promise<Item> {
+    return itemRepository.create({ ...data, userId });
   },
 
-  async update(id: number, data: Omit<Item, 'id' | 'created_at'>): Promise<Item> {
-    const item = await itemRepository.update(id, data);
+  async update(id: number, data: Omit<Item, 'id' | 'created_at'>, userId: number): Promise<Item> {
+    const item = await itemRepository.update(id, data, userId);
     if (!item) throw new Error('Item não encontrado.');
     return item;
   },
 
-  async delete(id: number): Promise<void> {
-    const deleted = await itemRepository.delete(id);
+  async delete(id: number, userId: number): Promise<void> {
+    const deleted = await itemRepository.delete(id, userId);
     if (!deleted) throw new Error('Item não encontrado.');
+  },
+
+  async updateStatus(id: number, status: Item['status']): Promise<void> {
+    await itemRepository.updateStatus(id, status);
   },
 };

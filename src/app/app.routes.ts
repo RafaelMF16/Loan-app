@@ -35,6 +35,13 @@ export const routes: Routes = [
       ),
   },
   {
+    path: 'loans',
+    loadComponent: () =>
+      import('./pages/loans/list-page/loans-list-page').then(
+        (module) => module.LoansListPageComponent
+      ),
+  },
+  {
     path: '**',
     redirectTo: 'auth/login',
   },

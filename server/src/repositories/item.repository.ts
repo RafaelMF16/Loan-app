@@ -1,8 +1,9 @@
+import { Pool, PoolClient } from 'pg';
 import { pool } from '../database/connection';
 import { Item } from '../types';
 
 const PAGE_SIZE = 10;
-const ITEM_COLUMNS = `id, name, description, status, status_detail AS "statusDetail", icon, created_at`;
+const ITEM_COLUMNS = `id, name, description, status, status_detail AS "statusDetail", icon, user_id AS "userId", created_at`;
 
 export interface PaginatedItems {
   rows: Item[];
@@ -10,23 +11,24 @@ export interface PaginatedItems {
 }
 
 export const itemRepository = {
-  async findAll(page: number, search: string): Promise<PaginatedItems> {
+  async findAll(page: number, search: string, userId: number): Promise<PaginatedItems> {
     const offset = (page - 1) * PAGE_SIZE;
     const pattern = `%${search}%`;
 
     const [dataResult, countResult] = await Promise.all([
       pool.query<Item>({
-        name: 'items-paginated',
+        name: 'items-paginated-v2',
         text: `SELECT ${ITEM_COLUMNS} FROM items
-               WHERE name ILIKE $1 OR description ILIKE $1
+               WHERE (name ILIKE $1 OR description ILIKE $1) AND user_id = $4
                ORDER BY created_at DESC
                LIMIT $2 OFFSET $3`,
-        values: [pattern, PAGE_SIZE, offset],
+        values: [pattern, PAGE_SIZE, offset, userId],
       }),
       pool.query<{ count: string }>({
-        name: 'items-count',
-        text: `SELECT COUNT(*) AS count FROM items WHERE name ILIKE $1 OR description ILIKE $1`,
-        values: [pattern],
+        name: 'items-count-v2',
+        text: `SELECT COUNT(*) AS count FROM items
+               WHERE (name ILIKE $1 OR description ILIKE $1) AND user_id = $2`,
+        values: [pattern, userId],
       }),
     ]);
 
@@ -36,44 +38,52 @@ export const itemRepository = {
     };
   },
 
-  async findById(id: number): Promise<Item | null> {
+  async findById(id: number, userId: number): Promise<Item | null> {
     const result = await pool.query<Item>({
-      name: 'items-by-id',
-      text: `SELECT ${ITEM_COLUMNS} FROM items WHERE id = $1`,
-      values: [id],
+      name: 'items-by-id-v2',
+      text: `SELECT ${ITEM_COLUMNS} FROM items WHERE id = $1 AND user_id = $2`,
+      values: [id, userId],
     });
     return result.rows[0] ?? null;
   },
 
-  async create(data: Omit<Item, 'id' | 'created_at'>): Promise<Item> {
+  async create(data: Omit<Item, 'id' | 'created_at'> & { userId: number }): Promise<Item> {
     const result = await pool.query<Item>({
-      name: 'items-create',
-      text: `INSERT INTO items (name, description, status, status_detail, icon)
-             VALUES ($1, $2, $3, $4, $5)
+      name: 'items-create-v2',
+      text: `INSERT INTO items (name, description, status, status_detail, icon, user_id)
+             VALUES ($1, $2, $3, $4, $5, $6)
              RETURNING ${ITEM_COLUMNS}`,
-      values: [data.name, data.description, data.status, data.statusDetail ?? null, data.icon],
+      values: [data.name, data.description, data.status, data.statusDetail ?? null, data.icon, data.userId],
     });
     return result.rows[0];
   },
 
-  async update(id: number, data: Omit<Item, 'id' | 'created_at'>): Promise<Item | null> {
+  async update(id: number, data: Omit<Item, 'id' | 'created_at'>, userId: number): Promise<Item | null> {
     const result = await pool.query<Item>({
-      name: 'items-update',
+      name: 'items-update-v2',
       text: `UPDATE items
              SET name=$1, description=$2, status=$3, status_detail=$4, icon=$5
-             WHERE id=$6
+             WHERE id=$6 AND user_id=$7
              RETURNING ${ITEM_COLUMNS}`,
-      values: [data.name, data.description, data.status, data.statusDetail ?? null, data.icon, id],
+      values: [data.name, data.description, data.status, data.statusDetail ?? null, data.icon, id, userId],
     });
     return result.rows[0] ?? null;
   },
 
-  async delete(id: number): Promise<boolean> {
+  async delete(id: number, userId: number): Promise<boolean> {
     const result = await pool.query({
-      name: 'items-delete',
-      text: 'DELETE FROM items WHERE id = $1',
-      values: [id],
+      name: 'items-delete-v2',
+      text: 'DELETE FROM items WHERE id = $1 AND user_id = $2',
+      values: [id, userId],
     });
     return (result.rowCount ?? 0) > 0;
+  },
+
+  async updateStatus(id: number, status: Item['status'], client?: PoolClient): Promise<void> {
+    const executor: Pool | PoolClient = client ?? pool;
+    await executor.query({
+      text: `UPDATE items SET status = $1 WHERE id = $2`,
+      values: [status, id],
+    });
   },
 };

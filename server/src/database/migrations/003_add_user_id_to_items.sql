@@ -1,0 +1,2 @@
+ALTER TABLE items ADD COLUMN IF NOT EXISTS user_id INTEGER REFERENCES users(id) ON DELETE CASCADE;
+CREATE INDEX IF NOT EXISTS items_user_id_idx ON items(user_id);

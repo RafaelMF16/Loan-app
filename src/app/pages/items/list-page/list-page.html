@@ -87,7 +87,7 @@
                 </div>
               </a>
 
-              <div class="flex items-center gap-4 self-end md:self-center">
+              <div class="flex items-center gap-3 self-end md:self-center">
                 <div class="text-right">
                   <span
                     class="inline-flex items-center gap-2 rounded-full px-3 py-1.5 text-base font-semibold"
@@ -100,6 +100,20 @@
                     <p class="mt-2 text-sm text-slate-400">{{ item.statusDetail }}</p>
                   }
                 </div>
+
+                @if (item.status === 'disponivel') {
+                  <button
+                    type="button"
+                    (click)="onClickOpenLoanModal(item)"
+                    class="inline-flex items-center gap-1.5 rounded-2xl border border-emerald-200 bg-emerald-50 px-3 py-2 text-sm font-semibold text-emerald-700 transition hover:bg-emerald-100"
+                    aria-label="Registrar empréstimo"
+                  >
+                    <svg viewBox="0 0 24 24" class="h-4 w-4" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                      <path d="M5 12h14" /><path d="m12 5 7 7-7 7" />
+                    </svg>
+                    Emprestar
+                  </button>
+                }
 
                 <button
                   type="button"
@@ -172,6 +186,14 @@
     <app-item-modal
       (close)="onClickCloseNewItemModal()"
       (save)="onClickSaveNewItem($event)"
+    />
+  }
+
+  @if (showLoanModal() && loanTargetItem()) {
+    <app-loan-modal
+      [item]="loanTargetItem()!"
+      (close)="onClickCloseLoanModal()"
+      (save)="onClickSaveLoan($event)"
     />
   }
 </section>

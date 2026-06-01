@@ -1,0 +1,149 @@
+<section class="min-h-screen bg-white">
+  <app-app-header [showAvatar]="true" />
+
+  <main class="min-h-[calc(100vh-65px)] bg-slate-50 px-5 py-8 text-slate-900">
+    <div class="mx-auto flex w-full max-w-6xl flex-col gap-6">
+      <section>
+        <h1 class="text-[2.8rem] font-semibold leading-none tracking-tight text-slate-950">
+          Empréstimos
+        </h1>
+        <p class="mt-2 text-base text-slate-500">Acompanhe todos os empréstimos registrados.</p>
+      </section>
+
+      <section class="rounded-[24px] border border-slate-200 bg-white p-5 shadow-[0_18px_40px_rgba(15,23,42,0.06)]">
+        <!-- Filter tabs -->
+        <div class="flex flex-col gap-4 border-b border-slate-200 pb-5 sm:flex-row sm:items-center sm:justify-between">
+          <nav class="flex gap-2" aria-label="Filtros de empréstimo">
+            @for (tab of [['todos', 'Todos'], ['ativo', 'Ativos'], ['devolvido', 'Devolvidos']] ; track tab[0]) {
+              <button
+                type="button"
+                (click)="onClickTab($any(tab[0]))"
+                [class]="activeTab() === tab[0]
+                  ? 'rounded-full bg-slate-900 px-4 py-2 text-sm font-semibold text-white'
+                  : 'rounded-full border border-slate-200 px-4 py-2 text-sm font-medium text-slate-600 transition hover:bg-slate-50'"
+              >
+                {{ tab[1] }}
+              </button>
+            }
+          </nav>
+
+          <p class="text-sm text-slate-500">{{ rangeText() }}</p>
+        </div>
+
+        <!-- Loans list -->
+        <div class="mt-5 space-y-3">
+          @for (loan of loans(); track loan.id) {
+            <article class="flex flex-col gap-4 rounded-[20px] border border-slate-200 bg-white px-4 py-4 transition hover:border-slate-300 md:flex-row md:items-center md:justify-between">
+              <a
+                class="flex min-w-0 flex-1 items-center gap-4 rounded-2xl outline-none transition focus-visible:ring-4 focus-visible:ring-blue-100"
+                [routerLink]="['/items', loan.itemId]"
+              >
+                <div class="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl bg-slate-100 text-slate-600">
+                  <svg viewBox="0 0 24 24" class="h-6 w-6" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                    <rect x="4" y="5" width="16" height="11" rx="1.8" />
+                    <path d="M2 19h20" />
+                  </svg>
+                </div>
+
+                <div class="min-w-0">
+                  <p class="truncate font-semibold text-slate-500 text-sm">{{ loan.itemName }}</p>
+                  <h3 class="text-lg font-semibold leading-tight text-slate-950">{{ loan.borrowerName }}</h3>
+                  @if (loan.borrowerEmail) {
+                    <p class="text-xs text-slate-400">{{ loan.borrowerEmail }}</p>
+                  }
+                </div>
+              </a>
+
+              <div class="flex flex-wrap items-center gap-4 self-end md:self-center">
+                <div class="text-right">
+                  <p class="text-xs text-slate-400">Saída</p>
+                  <p class="text-sm font-medium text-slate-700">{{ formatDate(loan.loanDate) }}</p>
+                </div>
+
+                <div class="text-right">
+                  <p class="text-xs text-slate-400">Devolução prevista</p>
+                  <p
+                    class="text-sm font-medium"
+                    [class]="loan.status === 'atrasado' ? 'text-rose-600 font-semibold' : 'text-slate-700'"
+                  >
+                    {{ formatDate(loan.expectedReturnDate) }}
+                  </p>
+                </div>
+
+                <span
+                  class="rounded-full px-3 py-1.5 text-sm font-semibold"
+                  [class]="getLoanStatusClasses(loan.status)"
+                >
+                  {{ getLoanStatusLabel(loan.status) }}
+                </span>
+
+                @if (isReturnable(loan)) {
+                  <button
+                    type="button"
+                    (click)="onClickReturnLoan(loan)"
+                    class="inline-flex items-center gap-1.5 rounded-2xl border border-slate-200 bg-white px-4 py-2 text-sm font-semibold text-slate-700 shadow-sm transition hover:border-slate-300 hover:bg-slate-50"
+                  >
+                    <svg viewBox="0 0 24 24" class="h-4 w-4" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                      <path d="M9 14 4 9l5-5" /><path d="M4 9h10.5a5.5 5.5 0 0 1 0 11H11" />
+                    </svg>
+                    Devolver
+                  </button>
+                }
+              </div>
+            </article>
+          } @empty {
+            <div class="rounded-[20px] border border-dashed border-slate-200 bg-slate-50 px-6 py-10 text-center">
+              <p class="text-lg font-medium text-slate-700">Nenhum empréstimo encontrado.</p>
+              <p class="mt-2 text-sm text-slate-500">
+                @if (activeTab() !== 'todos') {
+                  Tente outro filtro ou registre um novo empréstimo na lista de itens.
+                } @else {
+                  Registre um empréstimo na lista de itens.
+                }
+              </p>
+            </div>
+          }
+        </div>
+
+        <!-- Pagination -->
+        @if (pagination().totalPages > 1) {
+          <div class="mt-6 flex flex-col items-center justify-between gap-4 border-t border-slate-200 pt-5 sm:flex-row">
+            <p class="text-sm text-slate-500">{{ rangeText() }}</p>
+
+            <nav class="flex items-center gap-1" aria-label="Paginação">
+              <button
+                type="button"
+                (click)="onClickPrevPage()"
+                [disabled]="pagination().page === 1"
+                class="rounded-xl border border-slate-200 px-3 py-2 text-sm font-medium text-slate-600 transition hover:bg-slate-50 disabled:cursor-not-allowed disabled:opacity-40"
+              >
+                Anterior
+              </button>
+
+              @for (page of pages(); track page) {
+                <button
+                  type="button"
+                  (click)="onClickGoToPage(page)"
+                  [class]="page === pagination().page
+                    ? 'rounded-xl bg-blue-500 px-3.5 py-2 text-sm font-semibold text-white'
+                    : 'rounded-xl border border-slate-200 px-3.5 py-2 text-sm font-medium text-slate-600 transition hover:bg-slate-50'"
+                >
+                  {{ page }}
+                </button>
+              }
+
+              <button
+                type="button"
+                (click)="onClickNextPage()"
+                [disabled]="pagination().page === pagination().totalPages"
+                class="rounded-xl border border-slate-200 px-3 py-2 text-sm font-medium text-slate-600 transition hover:bg-slate-50 disabled:cursor-not-allowed disabled:opacity-40"
+              >
+                Próximo
+              </button>
+            </nav>
+          </div>
+        }
+      </section>
+    </div>
+  </main>
+</section>

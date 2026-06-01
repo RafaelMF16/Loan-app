@@ -1,0 +1,103 @@
+<div class="fixed inset-0 z-50 flex items-center justify-center bg-slate-950/45 px-4 py-8 backdrop-blur-sm">
+  <div class="w-full max-w-[480px] overflow-hidden rounded-[20px] bg-white shadow-[0_26px_64px_rgba(15,23,42,0.22)]">
+    <div class="flex items-center justify-between border-b border-slate-200 px-5 py-4">
+      <div>
+        <h2 class="text-lg font-semibold tracking-tight text-slate-950">Registrar Empréstimo</h2>
+        <p class="text-xs text-slate-500">{{ item.name }}</p>
+      </div>
+      <button
+        type="button"
+        (click)="onClickCloseModal()"
+        class="rounded-full p-1.5 text-slate-400 transition hover:bg-slate-100 hover:text-slate-600"
+        aria-label="Fechar modal"
+      >
+        <svg viewBox="0 0 24 24" class="h-5 w-5" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true">
+          <path d="m6 6 12 12" /><path d="M18 6 6 18" />
+        </svg>
+      </button>
+    </div>
+
+    <form class="space-y-4 px-5 py-5" [formGroup]="form" (ngSubmit)="onClickSaveLoan()">
+      <div class="space-y-1.5">
+        <label class="block text-xs font-semibold text-slate-700" for="borrower-name">
+          Nome do responsável <span class="text-rose-500">*</span>
+        </label>
+        <input
+          id="borrower-name"
+          type="text"
+          formControlName="borrowerName"
+          class="w-full rounded-xl border border-slate-200 px-3.5 py-2.5 text-sm text-slate-900 outline-none transition placeholder:text-slate-400 focus:border-blue-400 focus:ring-4 focus:ring-blue-100"
+          placeholder="Ex: João Silva"
+        />
+        @if (form.controls.borrowerName.invalid && form.controls.borrowerName.touched) {
+          <p class="text-xs text-rose-500">Nome é obrigatório.</p>
+        }
+      </div>
+
+      <div class="grid grid-cols-2 gap-3">
+        <div class="space-y-1.5">
+          <label class="block text-xs font-semibold text-slate-700" for="borrower-email">E-mail</label>
+          <input
+            id="borrower-email"
+            type="email"
+            formControlName="borrowerEmail"
+            class="w-full rounded-xl border border-slate-200 px-3.5 py-2.5 text-sm text-slate-900 outline-none transition placeholder:text-slate-400 focus:border-blue-400 focus:ring-4 focus:ring-blue-100"
+            placeholder="joao@exemplo.com"
+          />
+          @if (form.controls.borrowerEmail.invalid && form.controls.borrowerEmail.touched) {
+            <p class="text-xs text-rose-500">E-mail inválido.</p>
+          }
+        </div>
+
+        <div class="space-y-1.5">
+          <label class="block text-xs font-semibold text-slate-700" for="borrower-contact">Contato / Matrícula</label>
+          <input
+            id="borrower-contact"
+            type="text"
+            formControlName="borrowerContact"
+            class="w-full rounded-xl border border-slate-200 px-3.5 py-2.5 text-sm text-slate-900 outline-none transition placeholder:text-slate-400 focus:border-blue-400 focus:ring-4 focus:ring-blue-100"
+            placeholder="(11) 99999-0000"
+          />
+        </div>
+      </div>
+
+      <div class="space-y-1.5">
+        <label class="block text-xs font-semibold text-slate-700" for="expected-return">Devolução prevista</label>
+        <input
+          id="expected-return"
+          type="date"
+          formControlName="expectedReturnDate"
+          [min]="today"
+          class="w-full rounded-xl border border-slate-200 px-3.5 py-2.5 text-sm text-slate-900 outline-none transition focus:border-blue-400 focus:ring-4 focus:ring-blue-100"
+        />
+      </div>
+
+      <div class="space-y-1.5">
+        <label class="block text-xs font-semibold text-slate-700" for="loan-notes">Observações</label>
+        <textarea
+          id="loan-notes"
+          rows="2"
+          formControlName="notes"
+          class="w-full resize-none rounded-xl border border-slate-200 px-3.5 py-2.5 text-sm text-slate-900 outline-none transition placeholder:text-slate-400 focus:border-blue-400 focus:ring-4 focus:ring-blue-100"
+          placeholder="Condição do item, sala de destino..."
+        ></textarea>
+      </div>
+
+      <div class="flex items-center justify-end gap-2 pt-1">
+        <button
+          type="button"
+          (click)="onClickCloseModal()"
+          class="rounded-xl border border-slate-200 px-4 py-2 text-sm font-medium text-slate-700 transition hover:bg-slate-50"
+        >
+          Cancelar
+        </button>
+        <button
+          type="submit"
+          class="rounded-xl bg-emerald-500 px-5 py-2 text-sm font-semibold text-white shadow-[0_6px_16px_rgba(16,185,129,0.25)] transition hover:bg-emerald-600"
+        >
+          Registrar Empréstimo
+        </button>
+      </div>
+    </form>
+  </div>
+</div>

@@ -39,6 +39,75 @@
             </div>
           </div>
 
+          <!-- Loan action panel -->
+          <div class="mt-6">
+            @if (selectedItem.status === 'disponivel') {
+              <button
+                type="button"
+                (click)="onClickOpenLoanModal()"
+                class="inline-flex items-center gap-2 rounded-2xl bg-emerald-500 px-5 py-2.5 text-base font-semibold text-white shadow-[0_8px_20px_rgba(16,185,129,0.25)] transition hover:bg-emerald-600"
+              >
+                <svg viewBox="0 0 24 24" class="h-4 w-4" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                  <path d="M5 12h14" /><path d="m12 5 7 7-7 7" />
+                </svg>
+                Registrar Empréstimo
+              </button>
+            }
+
+            @if (selectedItem.status === 'emprestado' && activeLoan(); as loan) {
+              <div class="rounded-2xl border border-amber-200 bg-amber-50 p-5">
+                <p class="text-sm font-semibold uppercase tracking-[0.15em] text-amber-600">Empréstimo Ativo</p>
+                <div class="mt-3 grid grid-cols-1 gap-3 sm:grid-cols-3">
+                  <div>
+                    <p class="text-xs text-slate-500">Responsável</p>
+                    <p class="mt-0.5 font-semibold text-slate-900">{{ loan.borrowerName }}</p>
+                    @if (loan.borrowerEmail) {
+                      <p class="text-xs text-slate-500">{{ loan.borrowerEmail }}</p>
+                    }
+                  </div>
+                  <div>
+                    <p class="text-xs text-slate-500">Saída</p>
+                    <p class="mt-0.5 font-semibold text-slate-900">{{ formatDate(loan.loanDate) }}</p>
+                  </div>
+                  <div>
+                    <p class="text-xs text-slate-500">Devolução prevista</p>
+                    <p class="mt-0.5 font-semibold" [class]="loan.status === 'atrasado' ? 'text-rose-600' : 'text-slate-900'">
+                      {{ formatDate(loan.expectedReturnDate) }}
+                      @if (loan.status === 'atrasado') {
+                        <span class="ml-1 text-xs">(atrasado)</span>
+                      }
+                    </p>
+                  </div>
+                </div>
+                <div class="mt-4 flex items-center gap-3">
+                  <button
+                    type="button"
+                    (click)="onClickReturnItem()"
+                    class="inline-flex items-center gap-2 rounded-2xl bg-slate-800 px-5 py-2.5 text-sm font-semibold text-white transition hover:bg-slate-900"
+                  >
+                    <svg viewBox="0 0 24 24" class="h-4 w-4" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                      <path d="M9 14 4 9l5-5" /><path d="M4 9h10.5a5.5 5.5 0 0 1 0 11H11" />
+                    </svg>
+                    Registrar Devolução
+                  </button>
+                </div>
+              </div>
+            }
+
+            @if (selectedItem.status === 'emprestado' && !activeLoan()) {
+              <div class="rounded-2xl border border-amber-200 bg-amber-50 p-5">
+                <p class="text-sm text-amber-700">Item marcado como emprestado sem registro de empréstimo.</p>
+                <button
+                  type="button"
+                  (click)="onClickReturnItem()"
+                  class="mt-3 inline-flex items-center gap-2 rounded-2xl bg-slate-800 px-5 py-2.5 text-sm font-semibold text-white transition hover:bg-slate-900"
+                >
+                  Marcar como Disponível
+                </button>
+              </div>
+            }
+          </div>
+
           <div class="mt-10 border-t border-slate-200 pt-8">
             <p class="text-sm font-semibold uppercase tracking-[0.18em] text-slate-400">
               Descrição
@@ -46,6 +115,61 @@
             <p class="mt-5 max-w-3xl text-[1.15rem] leading-10 text-slate-800">
               {{ selectedItem.description }}
             </p>
+          </div>
+
+          <!-- Loan history -->
+          <div class="mt-8 border-t border-slate-200 pt-8">
+            <button
+              type="button"
+              (click)="toggleHistory()"
+              class="flex items-center gap-2 text-sm font-semibold uppercase tracking-[0.18em] text-slate-400 transition hover:text-slate-600"
+            >
+              <svg
+                viewBox="0 0 24 24"
+                class="h-4 w-4 transition-transform"
+                [class.rotate-90]="showHistory()"
+                fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+                aria-hidden="true"
+              >
+                <path d="m9 18 6-6-6-6" />
+              </svg>
+              Histórico de Empréstimos
+              @if (loanHistory(); as h) {
+                <span class="ml-1 rounded-full bg-slate-100 px-2 py-0.5 text-xs font-medium text-slate-500">{{ h.total }}</span>
+              }
+            </button>
+
+            @if (showHistory()) {
+              <div class="mt-5">
+                @if (!loanHistory()?.data?.length) {
+                  <p class="text-sm text-slate-400">Nenhum empréstimo registrado para este item.</p>
+                } @else {
+                  <div class="overflow-hidden rounded-2xl border border-slate-200 bg-white">
+                    @for (loan of loanHistory()!.data; track loan.id) {
+                      <div class="flex flex-col gap-1 border-b border-slate-100 px-5 py-4 last:border-0 sm:flex-row sm:items-center sm:justify-between">
+                        <div>
+                          <p class="font-semibold text-slate-900">{{ loan.borrowerName }}</p>
+                          <p class="text-xs text-slate-500">
+                            {{ formatDate(loan.loanDate) }}
+                            @if (loan.actualReturnDate) {
+                              → devolvido {{ formatDate(loan.actualReturnDate) }}
+                            } @else if (loan.expectedReturnDate) {
+                              · previsto {{ formatDate(loan.expectedReturnDate) }}
+                            }
+                          </p>
+                        </div>
+                        <span
+                          class="self-start rounded-full px-3 py-1 text-xs font-semibold sm:self-auto"
+                          [class]="getLoanStatusClasses(loan.status)"
+                        >
+                          {{ getLoanStatusLabel(loan.status) }}
+                        </span>
+                      </div>
+                    }
+                  </div>
+                }
+              </div>
+            }
           </div>
         </section>
       } @else {
@@ -70,6 +194,14 @@
       [editItem]="item()"
       (close)="onClickCloseEditModal()"
       (save)="onClickSaveEdit($event)"
+    />
+  }
+
+  @if (showLoanModal() && item()) {
+    <app-loan-modal
+      [item]="item()!"
+      (close)="onClickCloseLoanModal()"
+      (save)="onClickSaveLoan($event)"
     />
   }
 </section>

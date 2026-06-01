@@ -1,0 +1,49 @@
+<!-- Success toasts — fixed bottom-right -->
+@if (notif.notifications().length > 0) {
+  <div class="fixed bottom-6 right-6 z-[200] flex flex-col gap-3" aria-live="polite">
+    @for (n of notif.notifications(); track n.id) {
+      @if (n.type === 'success') {
+        <div class="flex items-center gap-3 rounded-2xl bg-slate-900 px-5 py-3.5 text-sm font-medium text-white shadow-[0_12px_32px_rgba(15,23,42,0.22)]">
+          <span class="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-emerald-500">
+            <svg viewBox="0 0 24 24" class="h-3.5 w-3.5" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+              <path d="m5 12 5 5L20 7" />
+            </svg>
+          </span>
+          {{ n.message }}
+        </div>
+      }
+    }
+  </div>
+}
+
+<!-- Error modal -->
+@for (n of notif.notifications(); track n.id) {
+  @if (n.type === 'error') {
+    <div class="fixed inset-0 z-[300] flex items-center justify-center bg-slate-950/40 px-4 backdrop-blur-sm">
+      <div class="w-full max-w-[400px] overflow-hidden rounded-[20px] bg-white shadow-[0_26px_64px_rgba(15,23,42,0.22)]">
+        <div class="flex items-start gap-4 px-6 pt-6">
+          <span class="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-rose-100 text-rose-600">
+            <svg viewBox="0 0 24 24" class="h-5 w-5" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true">
+              <circle cx="12" cy="12" r="10" />
+              <path d="M12 8v4" />
+              <path d="M12 16h.01" />
+            </svg>
+          </span>
+          <div>
+            <h3 class="text-lg font-semibold text-slate-950">Algo deu errado</h3>
+            <p class="mt-1 text-sm leading-relaxed text-slate-600">{{ n.message }}</p>
+          </div>
+        </div>
+        <div class="px-6 pb-6 pt-5 text-right">
+          <button
+            type="button"
+            (click)="notif.dismiss(n.id)"
+            class="rounded-2xl bg-slate-900 px-6 py-2.5 text-sm font-semibold text-white transition hover:bg-slate-800"
+          >
+            OK
+          </button>
+        </div>
+      </div>
+    </div>
+  }
+}

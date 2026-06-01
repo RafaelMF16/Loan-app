@@ -20,3 +20,26 @@ export interface JwtPayload {
   userId: number;
   email: string;
 }
+
+export type LoanStatus = 'ativo' | 'devolvido' | 'atrasado';
+
+export interface Loan {
+  id: number;
+  itemId: number;
+  createdBy: number;
+  borrowerName: string;
+  borrowerEmail?: string;
+  borrowerContact?: string;
+  notes?: string;
+  loanDate: Date;
+  expectedReturnDate?: Date;
+  actualReturnDate?: Date;
+  status: LoanStatus;
+  createdAt: Date;
+}
+
+export interface LoanWithDetails extends Loan {
+  itemName: string;
+  itemIcon: string;
+  createdByName: string;
+}

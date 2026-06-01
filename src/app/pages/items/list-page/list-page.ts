@@ -1,26 +1,39 @@
 import { CommonModule } from '@angular/common';
-import { Component, computed, inject, signal } from '@angular/core';
+import { Component, OnInit, computed, inject, signal } from '@angular/core';
 import { RouterLink } from '@angular/router';
 import { AppHeaderComponent } from '../../../components/shared/app-header/app-header';
 import { ItemModalComponent } from '../../../components/items/item-modal/item-modal';
+import { LoanModalComponent } from '../../../components/loans/loan-modal/loan-modal';
 import {
   CreateInventoryItemPayload,
+  InventoryItem,
   InventoryItemStatus,
 } from '../../../models/items/inventory-item.model';
+import { CreateLoanPayload } from '../../../models/loans/loan.model';
 import { InventoryItemsService } from '../../../services/items/inventory-items.service';
+import { LoansService } from '../../../services/loans/loans.service';
+import { NotificationService } from '../../../services/notification/notification.service';
 
 @Component({
   selector: 'app-list-page',
   standalone: true,
-  imports: [CommonModule, RouterLink, AppHeaderComponent, ItemModalComponent],
+  imports: [CommonModule, RouterLink, AppHeaderComponent, ItemModalComponent, LoanModalComponent],
   templateUrl: './list-page.html',
   styleUrl: './list-page.scss',
 })
-export class ListPageComponent {
+export class ListPageComponent implements OnInit {
   private readonly inventoryItemsService = inject(InventoryItemsService);
+  private readonly loansService = inject(LoansService);
+  private readonly notif = inject(NotificationService);
 
   readonly filterQuery = signal('');
   readonly showNewItemModal = signal(false);
+
+  ngOnInit(): void {
+    this.inventoryItemsService.loadPage(1);
+  }
+  readonly showLoanModal = signal(false);
+  readonly loanTargetItem = signal<InventoryItem | null>(null);
   readonly items = this.inventoryItemsService.items;
   readonly pagination = this.inventoryItemsService.pagination;
 
@@ -70,7 +83,36 @@ export class ListPageComponent {
   }
 
   onClickDeleteItem(itemId: number): void {
-    this.inventoryItemsService.deleteItem(itemId);
+    this.inventoryItemsService.deleteItem(itemId).subscribe({
+      next: () => this.inventoryItemsService.loadPage(this.pagination().page),
+      error: (err) => {
+        this.notif.error(err?.error?.message ?? 'Erro ao excluir item.');
+      },
+    });
+  }
+
+  onClickOpenLoanModal(item: InventoryItem): void {
+    this.loanTargetItem.set(item);
+    this.showLoanModal.set(true);
+  }
+
+  onClickCloseLoanModal(): void {
+    this.showLoanModal.set(false);
+    this.loanTargetItem.set(null);
+  }
+
+  onClickSaveLoan(payload: CreateLoanPayload): void {
+    this.loansService.createLoan(payload).subscribe({
+      next: () => {
+        this.notif.success('Empréstimo registrado com sucesso!');
+        this.showLoanModal.set(false);
+        this.loanTargetItem.set(null);
+        this.inventoryItemsService.loadPage(this.pagination().page);
+      },
+      error: (err) => {
+        this.notif.error(err?.error?.message ?? 'Erro ao registrar empréstimo.');
+      },
+    });
   }
 
   getStatusLabel(status: InventoryItemStatus): string {
