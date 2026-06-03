@@ -11,24 +11,32 @@ export interface PaginatedItems {
 }
 
 export const itemRepository = {
-  async findAll(page: number, search: string, userId: number): Promise<PaginatedItems> {
+  async findAll(page: number, search: string, userId: number, status?: string): Promise<PaginatedItems> {
     const offset = (page - 1) * PAGE_SIZE;
     const pattern = `%${search}%`;
 
+    const conditions: string[] = ['(name ILIKE $1 OR description ILIKE $1)', 'user_id = $2'];
+    const values: (string | number)[] = [pattern, userId];
+
+    if (status) {
+      values.push(status);
+      conditions.push(`status = $${values.length}`);
+    }
+
+    const where = `WHERE ${conditions.join(' AND ')}`;
+    const countValues = [...values];
+    values.push(PAGE_SIZE, offset);
+
     const [dataResult, countResult] = await Promise.all([
       pool.query<Item>({
-        name: 'items-paginated-v2',
-        text: `SELECT ${ITEM_COLUMNS} FROM items
-               WHERE (name ILIKE $1 OR description ILIKE $1) AND user_id = $4
+        text: `SELECT ${ITEM_COLUMNS} FROM items ${where}
                ORDER BY created_at DESC
-               LIMIT $2 OFFSET $3`,
-        values: [pattern, PAGE_SIZE, offset, userId],
+               LIMIT $${values.length - 1} OFFSET $${values.length}`,
+        values,
       }),
       pool.query<{ count: string }>({
-        name: 'items-count-v2',
-        text: `SELECT COUNT(*) AS count FROM items
-               WHERE (name ILIKE $1 OR description ILIKE $1) AND user_id = $2`,
-        values: [pattern, userId],
+        text: `SELECT COUNT(*) AS count FROM items ${where}`,
+        values: countValues,
       }),
     ]);
 
@@ -85,5 +93,30 @@ export const itemRepository = {
       text: `UPDATE items SET status = $1 WHERE id = $2`,
       values: [status, id],
     });
+  },
+
+  async findAllAdmin(page: number, search: string): Promise<PaginatedItems> {
+    const offset = (page - 1) * PAGE_SIZE;
+    const pattern = `%${search}%`;
+
+    const [dataResult, countResult] = await Promise.all([
+      pool.query<Item>({
+        text: `SELECT ${ITEM_COLUMNS} FROM items
+               WHERE (name ILIKE $1 OR description ILIKE $1)
+               ORDER BY created_at DESC
+               LIMIT $2 OFFSET $3`,
+        values: [pattern, PAGE_SIZE, offset],
+      }),
+      pool.query<{ count: string }>({
+        text: `SELECT COUNT(*) AS count FROM items
+               WHERE (name ILIKE $1 OR description ILIKE $1)`,
+        values: [pattern],
+      }),
+    ]);
+
+    return {
+      rows: dataResult.rows,
+      total: parseInt(countResult.rows[0].count, 10),
+    };
   },
 };

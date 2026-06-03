@@ -6,6 +6,7 @@ import {
   CreateInventoryItemPayload,
   InventoryItem,
   InventoryItemIcon,
+  InventoryItemStatus,
   PaginatedItems,
 } from '../../models/items/inventory-item.model';
 import { RequestService } from '../request/request.service';
@@ -17,6 +18,7 @@ export class InventoryItemsService {
   private readonly requestService = inject(RequestService);
   private readonly paginationState = signal<PaginatedItems>(EMPTY_PAGE);
   private readonly currentSearch = signal('');
+  private readonly currentStatusFilter = signal<string>('');
   private readonly searchSubject = new Subject<string>();
 
   readonly pagination = this.paginationState.asReadonly();
@@ -25,15 +27,21 @@ export class InventoryItemsService {
   constructor() {
     this.searchSubject.pipe(debounceTime(300)).subscribe((search) => {
       this.currentSearch.set(search);
-      this.loadPage(1, search);
+      this.loadPage(1, search, this.currentStatusFilter());
     });
 
     this.loadPage(1);
   }
 
-  loadPage(page: number, search = this.currentSearch()): void {
-    const params = `?page=${page}&search=${encodeURIComponent(search)}`;
-    this.requestService.get<PaginatedItems>(`/items${params}`).subscribe({
+  loadPage(
+    page: number,
+    search = this.currentSearch(),
+    statusFilter = this.currentStatusFilter()
+  ): void {
+    this.currentStatusFilter.set(statusFilter);
+    const params = new URLSearchParams({ page: String(page), search });
+    if (statusFilter) params.set('status', statusFilter);
+    this.requestService.get<PaginatedItems>(`/items?${params.toString()}`).subscribe({
       next: (result) => this.paginationState.set(result),
     });
   }
@@ -49,13 +57,16 @@ export class InventoryItemsService {
   updateItem(id: number, payload: CreateInventoryItemPayload): Observable<InventoryItem> {
     return this.requestService.put<InventoryItem>(`/items/${id}`, {
       ...payload,
-      icon: this.pickIcon(payload.name),
+      icon: payload.icon ?? this.pickIcon(payload.name),
     });
   }
 
   addItem(payload: CreateInventoryItemPayload): void {
     this.requestService
-      .post<InventoryItem>('/items', { ...payload, icon: this.pickIcon(payload.name) })
+      .post<InventoryItem>('/items', {
+        ...payload,
+        icon: payload.icon ?? this.pickIcon(payload.name),
+      })
       .subscribe({
         next: () => this.loadPage(1),
       });

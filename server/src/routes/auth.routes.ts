@@ -9,7 +9,8 @@ authRouter.post('/login', async (req: Request, res: Response) => {
     const result = await authService.login(email, password);
     res.json(result);
   } catch (error) {
-    res.status(401).json({ message: error instanceof Error ? error.message : 'Erro ao fazer login.' });
+    const msg = error instanceof Error ? error.message : '';
+    res.status(401).json({ message: msg || 'Credenciais inválidas.' });
   }
 });
 
@@ -19,6 +20,7 @@ authRouter.post('/register', async (req: Request, res: Response) => {
     const result = await authService.register(name, email, password);
     res.status(201).json(result);
   } catch (error) {
-    res.status(400).json({ message: error instanceof Error ? error.message : 'Erro ao registrar.' });
+    const msg = error instanceof Error ? error.message : '';
+    res.status(400).json({ message: msg || 'Erro ao registrar. Tente novamente.' });
   }
 });

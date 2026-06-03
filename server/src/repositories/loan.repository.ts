@@ -37,6 +37,13 @@ export interface CreateLoanData {
   notes?: string;
 }
 
+export interface LoanFilters {
+  status?: string;
+  itemId?: number;
+  startDate?: string;
+  endDate?: string;
+}
+
 export const loanRepository = {
   async updateOverdueStatuses(): Promise<void> {
     await pool.query(
@@ -49,7 +56,7 @@ export const loanRepository = {
 
   async findAll(
     page: number,
-    filters: { status?: string; itemId?: number },
+    filters: LoanFilters,
     userId: number
   ): Promise<PaginatedLoansResult> {
     const offset = (page - 1) * PAGE_SIZE;
@@ -64,8 +71,59 @@ export const loanRepository = {
       values.push(filters.itemId);
       conditions.push(`l.item_id = $${values.length}`);
     }
+    if (filters.startDate) {
+      values.push(filters.startDate);
+      conditions.push(`l.loan_date >= $${values.length}::date`);
+    }
+    if (filters.endDate) {
+      values.push(filters.endDate);
+      conditions.push(`l.loan_date < ($${values.length}::date + INTERVAL '1 day')`);
+    }
 
     const where = `WHERE ${conditions.join(' AND ')}`;
+    const countValues = [...values];
+    values.push(PAGE_SIZE, offset);
+
+    const [dataResult, countResult] = await Promise.all([
+      pool.query<LoanWithDetails>({
+        text: `SELECT ${LOAN_COLUMNS}
+               FROM loans l
+               JOIN items i ON i.id = l.item_id
+               JOIN users u ON u.id = l.created_by
+               ${where}
+               ORDER BY l.created_at DESC
+               LIMIT $${values.length - 1} OFFSET $${values.length}`,
+        values,
+      }),
+      pool.query<{ count: string }>({
+        text: `SELECT COUNT(*) AS count
+               FROM loans l
+               JOIN items i ON i.id = l.item_id
+               ${where}`,
+        values: countValues,
+      }),
+    ]);
+
+    return {
+      rows: dataResult.rows,
+      total: parseInt(countResult.rows[0].count, 10),
+    };
+  },
+
+  async findAllAdmin(
+    page: number,
+    filters: { status?: string }
+  ): Promise<PaginatedLoansResult> {
+    const offset = (page - 1) * PAGE_SIZE;
+    const conditions: string[] = [];
+    const values: (string | number)[] = [];
+
+    if (filters.status) {
+      values.push(filters.status);
+      conditions.push(`l.status = $${values.length}`);
+    }
+
+    const where = conditions.length ? `WHERE ${conditions.join(' AND ')}` : '';
     const countValues = [...values];
     values.push(PAGE_SIZE, offset);
 

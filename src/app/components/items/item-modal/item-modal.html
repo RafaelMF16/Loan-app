@@ -17,7 +17,7 @@
       </button>
     </div>
 
-    <form class="space-y-6 px-6 py-6" [formGroup]="form" (ngSubmit)="onClickSaveItem()">
+    <form class="space-y-5 px-6 py-6" [formGroup]="form" (ngSubmit)="onClickSaveItem()">
       <div class="space-y-2.5">
         <label class="block text-lg font-semibold text-slate-900" for="item-name">Nome do Item</label>
         <input
@@ -40,20 +40,49 @@
         ></textarea>
       </div>
 
+      <!-- Seletor visual de ícone -->
       <div class="space-y-2.5">
-        <label class="block text-lg font-semibold text-slate-900" for="item-status">Status</label>
-        <div class="relative">
-          <select
-            id="item-status"
-            formControlName="status"
-            class="w-full appearance-none rounded-2xl border border-slate-200 bg-white px-4 py-3.5 pr-12 text-sm text-slate-900 outline-none transition focus:border-blue-400 focus:ring-4 focus:ring-blue-100"
-          >
-            <option value="disponivel">Disponível</option>
-            <option value="emprestado">Emprestado</option>
-          </select>
-          <svg viewBox="0 0 24 24" class="pointer-events-none absolute right-4 top-1/2 h-5 w-5 -translate-y-1/2 text-slate-500" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-            <path d="m6 9 6 6 6-6" />
-          </svg>
+        <span class="block text-lg font-semibold text-slate-900">Ícone</span>
+        <div class="grid grid-cols-4 gap-2">
+          @for (icon of icons; track icon.value) {
+            <button
+              type="button"
+              (click)="selectIcon(icon.value)"
+              [class]="selectedIcon === icon.value
+                ? 'flex flex-col items-center gap-2 rounded-2xl border-2 border-blue-500 bg-blue-50 p-3 text-blue-700 transition'
+                : 'flex flex-col items-center gap-2 rounded-2xl border border-slate-200 bg-white p-3 text-slate-500 transition hover:border-slate-300 hover:bg-slate-50'"
+            >
+              @switch (icon.value) {
+                @case ('notebook') {
+                  <svg viewBox="0 0 24 24" class="h-6 w-6" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                    <rect x="4" y="5" width="16" height="11" rx="1.8" />
+                    <path d="M2 19h20" />
+                  </svg>
+                }
+                @case ('camera') {
+                  <svg viewBox="0 0 24 24" class="h-6 w-6" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                    <path d="M4 7h3l1.5-2h5L15 7h5v11H4z" />
+                    <circle cx="12" cy="12.5" r="3.2" />
+                  </svg>
+                }
+                @case ('tablet') {
+                  <svg viewBox="0 0 24 24" class="h-6 w-6" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                    <rect x="7" y="3" width="10" height="18" rx="1.8" />
+                    <path d="M10 6h4" />
+                    <circle cx="12" cy="17.5" r=".7" fill="currentColor" stroke="none" />
+                  </svg>
+                }
+                @case ('fone') {
+                  <svg viewBox="0 0 24 24" class="h-6 w-6" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                    <path d="M5 13a7 7 0 0 1 14 0" />
+                    <path d="M5 13v4a2 2 0 0 0 2 2h1v-6H7a2 2 0 0 0-2 2Z" />
+                    <path d="M19 13v4a2 2 0 0 1-2 2h-1v-6h1a2 2 0 0 1 2 2Z" />
+                  </svg>
+                }
+              }
+              <span class="text-xs font-medium">{{ icon.label }}</span>
+            </button>
+          }
         </div>
       </div>
 

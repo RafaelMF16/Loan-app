@@ -28,7 +28,7 @@ export class RegisterPageComponent {
       error: (err: { error?: { message?: string } }) => {
         this.feedback.set({
           type: 'error',
-          message: err?.error?.message ?? 'Erro ao registrar. Tente novamente.',
+          message: err?.error?.message || 'Erro ao registrar. Tente novamente.',
         });
       },
     });

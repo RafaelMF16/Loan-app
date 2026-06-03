@@ -18,10 +18,22 @@ export class AuthService {
 
   readonly currentUser = computed(() => this.currentUserState());
 
+  constructor() {
+    const stored = localStorage.getItem('auth_user');
+    if (stored) {
+      try {
+        this.currentUserState.set(JSON.parse(stored) as LoggedUser);
+      } catch {
+        // ignore corrupt data
+      }
+    }
+  }
+
   login(credentials: AuthCredentials): Observable<AuthResponse> {
     return this.requestService.post<AuthResponse>('/auth/login', credentials).pipe(
       tap(({ token, user }) => {
         localStorage.setItem('auth_token', token);
+        localStorage.setItem('auth_user', JSON.stringify(user));
         this.currentUserState.set(user);
       })
     );
@@ -37,6 +49,7 @@ export class AuthService {
       .pipe(
         tap(({ token, user }) => {
           localStorage.setItem('auth_token', token);
+          localStorage.setItem('auth_user', JSON.stringify(user));
           this.currentUserState.set(user);
         })
       );
@@ -44,6 +57,7 @@ export class AuthService {
 
   logout(): void {
     localStorage.removeItem('auth_token');
+    localStorage.removeItem('auth_user');
     this.currentUserState.set(null);
   }
 }

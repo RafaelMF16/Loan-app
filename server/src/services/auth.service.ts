@@ -8,7 +8,7 @@ const SALT_ROUNDS = 10;
 
 interface AuthResult {
   token: string;
-  user: { id: number; name: string; email: string };
+  user: { id: number; name: string; email: string; role: 'user' | 'admin' };
 }
 
 export const authService = {
@@ -19,10 +19,10 @@ export const authService = {
     const passwordMatch = await bcrypt.compare(password, user.password);
     if (!passwordMatch) throw new Error('Credenciais inválidas.');
 
-    const payload: JwtPayload = { userId: user.id, email: user.email };
+    const payload: JwtPayload = { userId: user.id, email: user.email, role: user.role };
     const token = jwt.sign(payload, JWT_SECRET, { expiresIn: '7d' });
 
-    return { token, user: { id: user.id, name: user.name, email: user.email } };
+    return { token, user: { id: user.id, name: user.name, email: user.email, role: user.role } };
   },
 
   async register(name: string, email: string, password: string): Promise<AuthResult> {
@@ -32,9 +32,9 @@ export const authService = {
     const hashedPassword = await bcrypt.hash(password, SALT_ROUNDS);
     const user = await userRepository.create(name, email, hashedPassword);
 
-    const payload: JwtPayload = { userId: user.id, email: user.email };
+    const payload: JwtPayload = { userId: user.id, email: user.email, role: 'user' };
     const token = jwt.sign(payload, JWT_SECRET, { expiresIn: '7d' });
 
-    return { token, user: { id: user.id, name: user.name, email: user.email } };
+    return { token, user: { id: user.id, name: user.name, email: user.email, role: 'user' } };
   },
 };

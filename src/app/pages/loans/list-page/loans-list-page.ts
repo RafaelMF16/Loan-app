@@ -21,6 +21,7 @@ export class LoansListPageComponent implements OnInit {
   private readonly notif = inject(NotificationService);
 
   readonly activeTab = signal<FilterTab>('todos');
+  readonly confirmReturnId = signal<number | null>(null);
   readonly loans = this.loansService.loans;
   readonly pagination = this.loansService.pagination;
 
@@ -43,6 +44,7 @@ export class LoansListPageComponent implements OnInit {
 
   onClickTab(tab: FilterTab): void {
     this.activeTab.set(tab);
+    this.confirmReturnId.set(null);
     const status = tab === 'todos' ? undefined : tab;
     this.loansService.loadPage(1, { status });
   }
@@ -61,16 +63,35 @@ export class LoansListPageComponent implements OnInit {
     this.loansService.loadPage(page, this.currentFilters());
   }
 
-  onClickReturnLoan(loan: Loan): void {
+  onClickRequestReturn(loanId: number): void {
+    this.confirmReturnId.set(loanId);
+  }
+
+  onClickCancelReturn(): void {
+    this.confirmReturnId.set(null);
+  }
+
+  onClickConfirmReturn(loan: Loan): void {
     this.loansService.returnLoan(loan.id).subscribe({
       next: () => {
+        this.confirmReturnId.set(null);
         this.notif.success('Devolução registrada com sucesso!');
         this.loansService.loadPage(this.pagination().page, this.currentFilters());
       },
       error: (err) => {
+        this.confirmReturnId.set(null);
         this.notif.error(err?.error?.message ?? 'Erro ao registrar devolução.');
       },
     });
+  }
+
+  getOverdueDays(loan: Loan): number | null {
+    if (loan.status !== 'atrasado' || !loan.expectedReturnDate) return null;
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    const due = new Date(loan.expectedReturnDate);
+    due.setHours(0, 0, 0, 0);
+    return Math.floor((today.getTime() - due.getTime()) / 86400000);
   }
 
   getLoanStatusLabel(status: LoanStatus): string {

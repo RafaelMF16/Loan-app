@@ -22,10 +22,19 @@ export const userRepository = {
 
   async create(name: string, email: string, hashedPassword: string): Promise<User> {
     const result = await pool.query<User>({
-      name: 'users-create',
-      text: 'INSERT INTO users (name, email, password) VALUES ($1, $2, $3) RETURNING *',
-      values: [name, email, hashedPassword],
+      name: 'users-create-v2',
+      text: 'INSERT INTO users (name, email, password, role) VALUES ($1, $2, $3, $4) RETURNING *',
+      values: [name, email, hashedPassword, 'user'],
     });
     return result.rows[0];
+  },
+
+  async findAll(): Promise<Omit<User, 'password'>[]> {
+    const result = await pool.query<Omit<User, 'password'>>({
+      name: 'users-find-all',
+      text: 'SELECT id, name, email, role, created_at FROM users ORDER BY created_at DESC',
+      values: [],
+    });
+    return result.rows;
   },
 };

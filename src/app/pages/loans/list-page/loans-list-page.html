@@ -36,7 +36,7 @@
             <article class="flex flex-col gap-4 rounded-[20px] border border-slate-200 bg-white px-4 py-4 transition hover:border-slate-300 md:flex-row md:items-center md:justify-between">
               <a
                 class="flex min-w-0 flex-1 items-center gap-4 rounded-2xl outline-none transition focus-visible:ring-4 focus-visible:ring-blue-100"
-                [routerLink]="['/items', loan.itemId]"
+                [routerLink]="['/loans', loan.id]"
               >
                 <div class="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl bg-slate-100 text-slate-600">
                   <svg viewBox="0 0 24 24" class="h-6 w-6" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
@@ -70,24 +70,49 @@
                   </p>
                 </div>
 
-                <span
-                  class="rounded-full px-3 py-1.5 text-sm font-semibold"
-                  [class]="getLoanStatusClasses(loan.status)"
-                >
-                  {{ getLoanStatusLabel(loan.status) }}
-                </span>
-
-                @if (isReturnable(loan)) {
-                  <button
-                    type="button"
-                    (click)="onClickReturnLoan(loan)"
-                    class="inline-flex items-center gap-1.5 rounded-2xl border border-slate-200 bg-white px-4 py-2 text-sm font-semibold text-slate-700 shadow-sm transition hover:border-slate-300 hover:bg-slate-50"
+                <div class="flex flex-col items-end gap-1">
+                  <span
+                    class="rounded-full px-3 py-1.5 text-sm font-semibold"
+                    [class]="getLoanStatusClasses(loan.status)"
                   >
-                    <svg viewBox="0 0 24 24" class="h-4 w-4" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-                      <path d="M9 14 4 9l5-5" /><path d="M4 9h10.5a5.5 5.5 0 0 1 0 11H11" />
-                    </svg>
-                    Devolver
-                  </button>
+                    {{ getLoanStatusLabel(loan.status) }}
+                  </span>
+                  @if (getOverdueDays(loan); as days) {
+                    <span class="text-xs font-medium text-rose-500">há {{ days }} dia(s)</span>
+                  }
+                </div>
+
+                <!-- Confirmação inline de devolução -->
+                @if (isReturnable(loan)) {
+                  @if (confirmReturnId() === loan.id) {
+                    <div class="flex items-center gap-2">
+                      <button
+                        type="button"
+                        (click)="onClickConfirmReturn(loan)"
+                        class="rounded-2xl border border-emerald-200 bg-emerald-50 px-3 py-2 text-sm font-semibold text-emerald-700 transition hover:bg-emerald-100"
+                      >
+                        Confirmar
+                      </button>
+                      <button
+                        type="button"
+                        (click)="onClickCancelReturn()"
+                        class="rounded-2xl border border-slate-200 px-3 py-2 text-sm font-medium text-slate-600 transition hover:bg-slate-50"
+                      >
+                        Cancelar
+                      </button>
+                    </div>
+                  } @else {
+                    <button
+                      type="button"
+                      (click)="onClickRequestReturn(loan.id)"
+                      class="inline-flex items-center gap-1.5 rounded-2xl border border-slate-200 bg-white px-4 py-2 text-sm font-semibold text-slate-700 shadow-sm transition hover:border-slate-300 hover:bg-slate-50"
+                    >
+                      <svg viewBox="0 0 24 24" class="h-4 w-4" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                        <path d="M9 14 4 9l5-5" /><path d="M4 9h10.5a5.5 5.5 0 0 1 0 11H11" />
+                      </svg>
+                      Devolver
+                    </button>
+                  }
                 }
               </div>
             </article>

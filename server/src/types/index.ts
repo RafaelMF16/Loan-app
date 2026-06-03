@@ -3,6 +3,7 @@ export interface User {
   name: string;
   email: string;
   password: string;
+  role: 'user' | 'admin';
   created_at: Date;
 }
 
@@ -19,6 +20,7 @@ export interface Item {
 export interface JwtPayload {
   userId: number;
   email: string;
+  role: 'user' | 'admin';
 }
 
 export type LoanStatus = 'ativo' | 'devolvido' | 'atrasado';

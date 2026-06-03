@@ -9,6 +9,8 @@ const EMPTY_PAGE: PaginatedLoans = { data: [], total: 0, page: 1, totalPages: 1,
 export interface LoanFilters {
   status?: string;
   itemId?: number;
+  startDate?: string;
+  endDate?: string;
 }
 
 @Injectable({ providedIn: 'root' })
@@ -48,6 +50,8 @@ export class LoansService {
     const params = new URLSearchParams({ page: String(page) });
     if (filters.status) params.set('status', filters.status);
     if (filters.itemId) params.set('itemId', String(filters.itemId));
+    if (filters.startDate) params.set('startDate', filters.startDate);
+    if (filters.endDate) params.set('endDate', filters.endDate);
     return `?${params.toString()}`;
   }
 }

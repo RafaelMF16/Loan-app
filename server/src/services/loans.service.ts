@@ -1,5 +1,5 @@
 import { pool } from '../database/connection';
-import { loanRepository, CreateLoanData } from '../repositories/loan.repository';
+import { loanRepository, LoanFilters } from '../repositories/loan.repository';
 import { itemRepository } from '../repositories/item.repository';
 import { LoanWithDetails } from '../types';
 import { PaginatedResult } from './items.service';
@@ -9,7 +9,7 @@ const PAGE_SIZE = 10;
 export const loansService = {
   async getAll(
     page: number,
-    filters: { status?: string; itemId?: number },
+    filters: LoanFilters,
     userId: number
   ): Promise<PaginatedResult<LoanWithDetails>> {
     await loanRepository.updateOverdueStatuses();
@@ -46,7 +46,7 @@ export const loansService = {
   },
 
   async createLoan(
-    data: Omit<CreateLoanData, 'createdBy'>,
+    data: Omit<{ itemId: number; borrowerName: string; borrowerEmail?: string; borrowerContact?: string; expectedReturnDate?: string; notes?: string }, never>,
     createdBy: number
   ): Promise<LoanWithDetails> {
     if (data.expectedReturnDate) {
@@ -65,31 +65,35 @@ export const loansService = {
     try {
       await client.query('BEGIN');
 
-      const itemResult = await client.query<{ id: number; status: string }>(
-        'SELECT id, status FROM items WHERE id = $1 FOR UPDATE',
-        [data.itemId]
+      const result = await client.query(
+        `SELECT * FROM sp_criar_emprestimo($1, $2, $3, $4, $5, $6, $7)`,
+        [
+          data.itemId,
+          createdBy,
+          data.borrowerName,
+          data.borrowerEmail ?? null,
+          data.borrowerContact ?? null,
+          data.expectedReturnDate ?? null,
+          data.notes ?? null,
+        ]
       );
-      const item = itemResult.rows[0];
 
-      if (!item) {
+      await client.query('COMMIT');
+
+      const createdLoan = result.rows[0];
+      const full = await loanRepository.findById(createdLoan.id, createdBy);
+      return full!;
+    } catch (error: any) {
+      await client.query('ROLLBACK');
+      if (error.code === 'P0002') {
         throw Object.assign(new Error('Item não encontrado.'), { statusCode: 404 });
       }
-      if (item.status !== 'disponivel') {
+      if (error.code === 'P0001') {
         throw Object.assign(
           new Error('Item não está disponível para empréstimo.'),
           { statusCode: 409 }
         );
       }
-
-      const loan = await loanRepository.create({ ...data, createdBy }, client);
-      await itemRepository.updateStatus(data.itemId, 'emprestado', client);
-
-      await client.query('COMMIT');
-
-      const full = await loanRepository.findById(loan.id, createdBy);
-      return full!;
-    } catch (error) {
-      await client.query('ROLLBACK');
       throw error;
     } finally {
       client.release();

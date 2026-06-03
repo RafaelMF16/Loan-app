@@ -15,6 +15,7 @@ export interface CreateInventoryItemPayload {
   name: string;
   description: string;
   status: InventoryItemStatus;
+  icon?: InventoryItemIcon;
 }
 
 export interface PaginatedItems {

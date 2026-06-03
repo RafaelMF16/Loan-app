@@ -14,6 +14,8 @@ import { InventoryItemsService } from '../../../services/items/inventory-items.s
 import { LoansService } from '../../../services/loans/loans.service';
 import { NotificationService } from '../../../services/notification/notification.service';
 
+type StatusFilter = '' | 'disponivel' | 'emprestado';
+
 @Component({
   selector: 'app-list-page',
   standalone: true,
@@ -27,13 +29,12 @@ export class ListPageComponent implements OnInit {
   private readonly notif = inject(NotificationService);
 
   readonly filterQuery = signal('');
+  readonly statusFilter = signal<StatusFilter>('');
   readonly showNewItemModal = signal(false);
-
-  ngOnInit(): void {
-    this.inventoryItemsService.loadPage(1);
-  }
   readonly showLoanModal = signal(false);
   readonly loanTargetItem = signal<InventoryItem | null>(null);
+  readonly confirmDeleteId = signal<number | null>(null);
+
   readonly items = this.inventoryItemsService.items;
   readonly pagination = this.inventoryItemsService.pagination;
 
@@ -49,24 +50,34 @@ export class ListPageComponent implements OnInit {
     return `${start}–${end} de ${total}`;
   });
 
+  ngOnInit(): void {
+    this.inventoryItemsService.loadPage(1);
+  }
+
   onInputFilterItems(event: Event): void {
     const value = (event.target as HTMLInputElement).value;
     this.filterQuery.set(value);
     this.inventoryItemsService.search(value);
   }
 
+  onClickStatusTab(status: StatusFilter): void {
+    this.statusFilter.set(status);
+    this.confirmDeleteId.set(null);
+    this.inventoryItemsService.loadPage(1, this.filterQuery(), status);
+  }
+
   onClickPrevPage(): void {
     const { page } = this.pagination();
-    if (page > 1) this.inventoryItemsService.loadPage(page - 1);
+    if (page > 1) this.inventoryItemsService.loadPage(page - 1, this.filterQuery(), this.statusFilter());
   }
 
   onClickNextPage(): void {
     const { page, totalPages } = this.pagination();
-    if (page < totalPages) this.inventoryItemsService.loadPage(page + 1);
+    if (page < totalPages) this.inventoryItemsService.loadPage(page + 1, this.filterQuery(), this.statusFilter());
   }
 
   onClickGoToPage(page: number): void {
-    this.inventoryItemsService.loadPage(page);
+    this.inventoryItemsService.loadPage(page, this.filterQuery(), this.statusFilter());
   }
 
   onClickOpenNewItemModal(): void {
@@ -82,10 +93,22 @@ export class ListPageComponent implements OnInit {
     this.showNewItemModal.set(false);
   }
 
-  onClickDeleteItem(itemId: number): void {
+  onClickRequestDelete(itemId: number): void {
+    this.confirmDeleteId.set(itemId);
+  }
+
+  onClickCancelDelete(): void {
+    this.confirmDeleteId.set(null);
+  }
+
+  onClickConfirmDelete(itemId: number): void {
     this.inventoryItemsService.deleteItem(itemId).subscribe({
-      next: () => this.inventoryItemsService.loadPage(this.pagination().page),
+      next: () => {
+        this.confirmDeleteId.set(null);
+        this.inventoryItemsService.loadPage(this.pagination().page, this.filterQuery(), this.statusFilter());
+      },
       error: (err) => {
+        this.confirmDeleteId.set(null);
         this.notif.error(err?.error?.message ?? 'Erro ao excluir item.');
       },
     });
@@ -107,7 +130,7 @@ export class ListPageComponent implements OnInit {
         this.notif.success('Empréstimo registrado com sucesso!');
         this.showLoanModal.set(false);
         this.loanTargetItem.set(null);
-        this.inventoryItemsService.loadPage(this.pagination().page);
+        this.inventoryItemsService.loadPage(this.pagination().page, this.filterQuery(), this.statusFilter());
       },
       error: (err) => {
         this.notif.error(err?.error?.message ?? 'Erro ao registrar empréstimo.');

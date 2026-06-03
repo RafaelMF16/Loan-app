@@ -12,8 +12,8 @@ export interface PaginatedResult<T> {
 }
 
 export const itemsService = {
-  async getAll(page: number, search: string, userId: number): Promise<PaginatedResult<Item>> {
-    const { rows, total } = await itemRepository.findAll(page, search, userId);
+  async getAll(page: number, search: string, userId: number, status?: string): Promise<PaginatedResult<Item>> {
+    const { rows, total } = await itemRepository.findAll(page, search, userId, status);
     return {
       data: rows,
       total,

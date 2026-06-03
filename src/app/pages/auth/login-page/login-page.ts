@@ -29,7 +29,7 @@ export class LoginPageComponent {
       },
       error: (err: { error?: { message?: string } }) => {
         this.successMessage.set(null);
-        this.authError.set(err?.error?.message ?? 'E-mail ou senha inválidos.');
+        this.authError.set(err?.error?.message || 'E-mail ou senha inválidos.');
       },
     });
   }
